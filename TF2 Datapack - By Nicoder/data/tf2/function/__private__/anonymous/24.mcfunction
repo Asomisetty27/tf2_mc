@@ -1,4 +1,3 @@
-execute store result score $X0 tf2.var run data get entity @s Pos[0] 100
-execute store result score $Y0 tf2.var run data get entity @s Pos[1] 100
-execute store result score $Z0 tf2.var run data get entity @s Pos[2] 100
-kill
+execute at @s anchored eyes run particle minecraft:sweep_attack ^ ^ ^1
+execute unless data storage iris:output {TargetType:"ENTITY"} run return run playsound tf2:item.melee.miss player @s ~ ~ ~ 0.35 0.35 0.1
+playsound tf2:item.melee.hit player @s ~ ~ ~ 1.5 0.9 0.1

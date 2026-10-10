@@ -1,0 +1,3 @@
+scoreboard players operation $tele_owner tf2.building.owner = @s tf2.building.owner
+execute if entity @s[tag=tf2.tele_entrance] as @e[type=item_display,tag=tf2.tele_exit] if score @s tf2.building.owner = $tele_owner tf2.building.owner run tag @s add tf2.tele_match
+execute if entity @s[tag=tf2.tele_exit] as @e[type=item_display,tag=tf2.tele_entrance] if score @s tf2.building.owner = $tele_owner tf2.building.owner run tag @s add tf2.tele_match

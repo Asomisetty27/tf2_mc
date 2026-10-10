@@ -1,3 +1,4 @@
-function tf2:weapons/save_arrow_speed
-execute as @e[tag=tf2.self] run function tf2:weapons/main_fire
-kill @s
+scoreboard players operation $surface_x tf2.var = @s tf2.collision_x
+scoreboard players set $surface_y tf2.var 0
+scoreboard players set $surface_z tf2.var 0
+function tf2:grenade/roll

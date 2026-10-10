@@ -1,5 +1,2 @@
-execute store result storage tf2:vars level int 1 run scoreboard players get @s tf2.building.level
-data modify storage tf2:actionbar buildings append value {text:"  Dispenser ",color:"gray"}
-data modify storage tf2:actionbar buildings append value {text:"L",color:"white"}
-data modify storage tf2:actionbar buildings append string storage tf2:vars level 0
-function tf2:building/status_line
+scoreboard players operation $level tf2.var = @s tf2.building.level
+execute on vehicle store result entity @s item.components.minecraft:custom_model_data.floats[0] int 1 run scoreboard players get $level tf2.var

@@ -1,4 +1,3 @@
-scoreboard players enable @s tf2.new_class
-dialog show @s[scores={tf2.team=1}] tf2:red_class_menu
-dialog show @s[scores={tf2.team=2}] tf2:blu_class_menu
-tag @s add tf2.in_class_menu
+execute as @e[type=!#tf2:player_like] run function tf2:session/check_validity
+execute store result score $batch_markers tf2.var if entity @e[type=marker,tag=tf2.batch]
+execute unless score $batch_markers tf2.var = $Settings.max_batches tf2.var run function tf2:setup_markers

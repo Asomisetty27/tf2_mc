@@ -1,2 +1,2 @@
-scoreboard players operation @s tf2.mot_x *= -1 tf2.const
-scoreboard players set __if_else__ tf2.var 1
+execute store result score $angular_speed tf2.var run data get storage tf2:lookup item.components.minecraft:custom_data.projectile.rotation.initial 0.9525
+function tf2:projectile/initial_rotation

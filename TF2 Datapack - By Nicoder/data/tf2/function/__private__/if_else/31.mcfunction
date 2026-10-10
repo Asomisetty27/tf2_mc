@@ -1,3 +1,6 @@
-scoreboard players operation $_clip_ tf2.var = @s tf2.secondary_clip
-scoreboard players operation $_maxClip_ tf2.var = @s tf2.secondary_maxClip
-scoreboard players operation $_ammo_ tf2.var = @s tf2.secondary_ammo
+scoreboard players operation $shells tf2.var = @s tf2.primary_maxAmmo
+scoreboard players operation $shells tf2.var -= @s tf2.primary_ammo
+scoreboard players operation $shells tf2.var < 40 tf2.const
+scoreboard players operation $shells tf2.var < $metal tf2.var
+scoreboard players operation @s tf2.primary_ammo += $shells tf2.var
+scoreboard players operation $metal tf2.var -= $shells tf2.var

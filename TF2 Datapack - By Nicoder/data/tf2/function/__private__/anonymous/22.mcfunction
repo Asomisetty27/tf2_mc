@@ -1,1 +1,2 @@
-$execute store result storage tf2:lookup item.components.minecraft:custom_data.projectile.speed double 0.001 run data get storage tf2:lookup item.components.minecraft:custom_data.projectile.speed $(magnitude)
+function iris:set_coordinates/main
+tag @s add tf2.temp

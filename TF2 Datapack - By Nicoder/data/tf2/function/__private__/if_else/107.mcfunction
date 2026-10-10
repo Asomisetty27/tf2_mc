@@ -1,3 +1,4 @@
-kill @e[type=arrow,tag=!tf2.projectile]
-execute if predicate tf2:ammo_in_clip run function tf2:weapons/main_fire
-scoreboard players set __if_else__ tf2.var 1
+scoreboard players set $surface_x tf2.var 0
+scoreboard players operation $surface_y tf2.var = @s tf2.collision_y
+scoreboard players set $surface_z tf2.var 0
+function tf2:grenade/roll

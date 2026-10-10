@@ -1,2 +1,3 @@
-execute store result entity @s transformation.translation[1] float 0.001 run scoreboard players get $depth tf2.var
-data modify entity @s start_interpolation set value 0
+execute if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
+execute unless score $placed tf2.var matches 1.. positioned ~ ~-1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
+execute unless score $placed tf2.var matches 1.. positioned ~ ~1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here

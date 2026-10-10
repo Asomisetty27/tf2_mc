@@ -56,6 +56,7 @@ function __tick__() {
     execute as @e[type=item_display,tag=tf2.door] at @s run Door.tick();
     execute as @e[tag=tf2.sentry] at @s run Building.Sentry.tick();
     execute as @e[tag=tf2.dispenser] at @s run Building.Dispenser.tick();
+    execute as @e[type=item_display, tag=tf2.teleporter] at @s run Building.Teleporter.tick();
     // execute as @e[type=item_display, tag=tf2.can_be_shot] run tellraw @a {"nbt":"Tags", "entity":"@s", "color": "green"};
 
     $flicker = $trigger_reminder = xrroou1m8_p_join:$__global__;

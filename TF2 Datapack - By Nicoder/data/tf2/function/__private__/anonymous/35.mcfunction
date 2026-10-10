@@ -1,3 +1,5 @@
-execute if score @s tf2.team = $winner tf2.var run return run tellraw @s {"text":"Victory.","bold":false,"italic":true,"type":"text"}
-execute if score $winner tf2.var matches 1..2 run tellraw @s {"text":"You've failed!","bold":false,"italic":true,"type":"text"}
-tag @s add tf2.humiliation
+scoreboard players set @s tf2.map 5
+scoreboard players operation @s tf2.batch_number > @e[type=marker,tag=tf2.batch] tf2.batch_number
+scoreboard players add @s tf2.batch_number 1
+execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
+function tf2:session/sync with storage tf2:index

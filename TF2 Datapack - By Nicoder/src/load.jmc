@@ -47,7 +47,7 @@ Hardcode.repeatList(
         "quaternion_r", "quaternion_i", "quaternion_j", "quaternion_k",
         "ang_vel_x", "ang_vel_y", "ang_vel_z",
         "building.target", "building.x", "building.y", "building.z", "building.level", "building.ticks_idle", "building.last_yaw", "building.owner",
-        "metal", "building.type", "building.progress", "building.boost", "building.granted_hp", "building.upgrade_metal", "building.metal"
+        "metal", "building.type", "building.progress", "building.boost", "building.granted_hp", "building.upgrade_metal", "building.metal", "building.tele_timer", "building.tele_player"
     ]
 );
 

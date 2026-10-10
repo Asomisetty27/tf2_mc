@@ -52,6 +52,8 @@
 #define ENGINEER_MAX_METAL 200
 #define SENTRY_COST 130
 #define DISPENSER_COST 100
+#define TELEPORTER_COST 50
+#define TELEPORTER_HP_PER_METAL 5
 #define UPGRADE_METAL 200
 #define UPGRADE_METAL_PER_HIT 25
 #define WRENCH_REPAIR_PER_HIT 102
@@ -60,6 +62,7 @@
 // build times in ticks: 10.5 s and 21 s
 #define SENTRY_BUILD_TICKS 210
 #define DISPENSER_BUILD_TICKS 420
+#define TELEPORTER_BUILD_TICKS 420
 // wrench hits on a building under construction add +1.5x build rate for 1 s (2.5x total)
 #define CONSTRUCTION_BOOST_TICKS 20
 #define DISPENSER_MAX_METAL 400

@@ -1,0 +1,230 @@
+// Teleporters follow CObjectTeleporter in Valve's source-sdk-2013:
+//   the entrance sends whoever stands still on it (under 5 HU/s) once it's ready
+//   the player arrives at the exit 0.35 s later (0.1 s send + 0.25 s fade out), facing the way the exit faces
+//   the entrance then recharges for 0.5 s of fades plus 10 / 5 / 3 s depending on level
+//   teammates and any Spy can use it; enemies standing on the exit get telefragged
+//   entrance and exit share one upgrade level and upgrade progress, and wrench repairs heal both
+// The exit is passive: the entrance drives the whole teleport.
+
+class building.teleporter {
+    function spawn() {
+        // @s = Engineer, $type = 2 (entrance) or 3 (exit)
+        summon item_display ~ ~0.875 ~ {
+            Rotation: [0.0f, 0.0f],
+            Tags: ["tf2.teleporter", 'tf2.can_be_shot', 'tf2.new', 'tf2.just_spawned'],
+            CustomName: "Teleporter",
+            CustomNameVisible: false,
+            item: {
+                id: "minecraft:white_dye",
+                components: {
+                    "minecraft:item_model": "tf2:building/teleporter",
+                    "minecraft:custom_model_data": {floats:[1, 1]},
+                }
+            },
+            transformation: {
+                right_rotation: [0.0f, 0.0f, 0.0f, 1.0f],
+                scale: [1.75f, 1.75f, 1.75f],
+                left_rotation: [0.0f, 0.0f, 0.0f, 1.0f],
+                translation: [0.0f, 0.0f, 0.0f]
+            },
+        };
+        $id = tf2.player.id:@s;
+        $batch = tf2.batch_number:@s;
+        execute as @n[tag=tf2.new] expand {
+            @s::item.components."minecraft:custom_model_data".floats[0] = tf2.team:@s = summon::teleporter.team;
+            @s::item.components."minecraft:custom_model_data".floats[1] = tf2.building.level:@s = summon::teleporter.level;
+            tf2.attack_delay:@s = 0;
+            tf2.building.tele_timer:@s = 0;
+            tf2.building.upgrade_metal:@s = 0;
+            tf2.player.id:$global++;
+            tf2.player.id:@s = tf2.player.id:$global;
+            tf2.building.owner:@s = $id;
+            tf2.batch_number:@s = $batch;
+            tf2.hitbox:@s = 1500;
+            building.apply_level();
+            tf2.health:@s = tf2.max_health:@s;
+            tag @s remove tf2.new;
+        }
+        execute if score $type tf2.var matches 2 as @n[tag=tf2.just_spawned, tag=tf2.teleporter] run {
+            tag @s add tf2.tele_entrance;
+            @s::CustomName = "Teleporter Entrance";
+        }
+        execute if score $type tf2.var matches 3 as @n[tag=tf2.just_spawned, tag=tf2.teleporter] run {
+            tag @s add tf2.tele_exit;
+            @s::CustomName = "Teleporter Exit";
+        }
+    }
+
+    function tag_match() {
+        // Tags the other end of @s's pair with tf2.tele_match
+        tf2.building.owner:$tele_owner = tf2.building.owner:@s;
+        execute if entity @s[tag=tf2.tele_entrance]
+                as @e[type=item_display, tag=tf2.tele_exit]
+                if score @s tf2.building.owner = $tele_owner tf2.building.owner
+                run tag @s add tf2.tele_match;
+        execute if entity @s[tag=tf2.tele_exit]
+                as @e[type=item_display, tag=tf2.tele_entrance]
+                if score @s tf2.building.owner = $tele_owner tf2.building.owner
+                run tag @s add tf2.tele_match;
+    }
+
+    function tick() {
+        tag @s remove tf2.new;
+
+        if (tf2.health:@s <= 0) {
+            return run this.die();
+        }
+        if (entity @s[tag=tf2.constructing]) {
+            return run building.construction_tick();
+        }
+        if (entity @s[tag=tf2.tele_exit]) {
+            return 0;
+        }
+
+        this.tag_match();
+        this.entrance_tick();
+        tag @e remove tf2.tele_match;
+    }
+
+    function entrance_tick() {
+        // @s = finished entrance, its exit (if any) has tf2.tele_match
+        tf2.attack_delay:@s[scores={tf2.attack_delay=1..}]--;
+
+        if (tf2.building.tele_timer:@s > 0) {
+            tf2.building.tele_timer:@s--;
+            if (tf2.building.tele_timer:@s == 0) {
+                this.arrive();
+            }
+        }
+
+        $ready = true;
+        if (!entity @e[tag=tf2.tele_match, tag=!tf2.constructing]) $ready = false;
+        if (entity @s[tag=tf2.sapped]) $ready = false;
+        if (entity @e[tag=tf2.tele_match, tag=tf2.sapped]) $ready = false;
+        if (tf2.attack_delay:@s > 0) $ready = false;
+        if (tf2.building.tele_timer:@s > 0) $ready = false;
+        if (!$ready) {
+            return run tag @s remove tf2.tele_ready;
+        }
+
+        if (entity @s[tag=!tf2.tele_ready]) {
+            playsound minecraft:block.note_block.chime block @a ~ ~ ~ 0.6 1.6;
+            tag @s add tf2.tele_ready;
+        }
+        $particle_timer := xrroou1m8_p_join:$__global__ % 10;
+        if ($particle_timer == 0) {
+            particle minecraft:portal ~ ~-0.6 ~ 0.25 0.05 0.25 0.2 4;
+        }
+
+        // whoever is standing on the pad: 48 x 48 HU, just above the floor
+        tf2.team:$temp = tf2.team:@s;
+        execute positioned ~-0.4572 ~-0.875 ~-0.4572
+                as @e[type=#tf2:player_like, dx=0.9144, dy=0.3, dz=0.9144, tag=!tf2.dead]
+                unless entity @s[gamemode=spectator]
+                run tag @s add tf2.tele_candidate;
+        // teammates, and Spies from either team (PlayerCanBeTeleported)
+        execute as @e[tag=tf2.tele_candidate]
+                unless score @s tf2.team = $temp tf2.team
+                unless entity @s[scores={tf2.class=Class.SPY}]
+                run tag @s remove tf2.tele_candidate;
+        execute as @e[type=player, tag=tf2.tele_candidate] run this.require_standing_still();
+
+        if (entity @e[tag=tf2.tele_candidate]) {
+            this.send();
+        }
+        tag @e remove tf2.tele_candidate;
+    }
+
+    function require_standing_still() {
+        // TF2 only sends players moving slower than 5 HU/s, about 5 thousandths of a block per tick
+        $dx := tf2.now_x:@s - tf2.last_x:@s;
+        $dz := tf2.now_z:@s - tf2.last_z:@s;
+        $still = true;
+        if ($dx > 5) $still = false;
+        if ($dx < -5) $still = false;
+        if ($dz > 5) $still = false;
+        if ($dz < -5) $still = false;
+        if (!$still) {
+            tag @s remove tf2.tele_candidate;
+        }
+    }
+
+    function send() {
+        // @s = entrance
+        tf2.building.tele_player:@s = tf2.player.id:@n[tag=tf2.tele_candidate];
+        tf2.building.tele_timer:@s = 7;
+        tag @s remove tf2.tele_ready;
+
+        // recharge = fade out + fade in (0.5 s) + 10 / 5 / 3 s
+        tf2.attack_delay:@s = 210;
+        tf2.attack_delay:@s[scores={tf2.building.level=2}] = 110;
+        tf2.attack_delay:@s[scores={tf2.building.level=3..}] = 70;
+
+        playsound minecraft:entity.enderman.teleport block @a ~ ~ ~ 0.7 1.3;
+        particle minecraft:reverse_portal ~ ~-0.4 ~ 0.25 0.5 0.25 0.05 30;
+        execute at @e[tag=tf2.tele_match, limit=1]
+                run particle minecraft:portal ~ ~-0.4 ~ 0.25 0.5 0.25 0.5 30;
+    }
+
+    function arrive() {
+        // @s = entrance. Moves the player to the exit and telefrags enemies standing on it.
+        tf2.building.tele_player:$traveler = tf2.building.tele_player:@s;
+        execute as @e[type=#tf2:player_like, tag=!tf2.dead]
+                if score @s tf2.player.id = $traveler tf2.building.tele_player
+                run tag @s add tf2.tele_traveler;
+        tf2.building.tele_player:@s.reset();
+
+        if (entity @e[tag=tf2.tele_match, tag=!tf2.constructing] && entity @e[tag=tf2.tele_traveler]) {
+            tf2.team:$traveler_team = tf2.team:@n[tag=tf2.tele_traveler];
+            tf2.player.id:$traveler_id = tf2.player.id:@n[tag=tf2.tele_traveler];
+            execute at @e[tag=tf2.tele_match, limit=1]
+                    positioned ~-0.55 ~-0.875 ~-0.55
+                    as @e[type=#tf2:player_like, dx=1.1, dy=1.8, dz=1.1, tag=!tf2.dead, tag=!tf2.tele_traveler]
+                    unless score @s tf2.team = $traveler_team tf2.team
+                    run this.telefrag();
+
+            execute as @e[tag=tf2.tele_traveler]
+                    at @e[tag=tf2.tele_match, limit=1]
+                    rotated as @e[tag=tf2.tele_match, limit=1]
+                    positioned ~ ~-0.627 ~
+                    run tp @s ~ ~ ~ ~ 0;
+            execute at @e[tag=tf2.tele_match, limit=1] run {
+                playsound minecraft:entity.enderman.teleport block @a ~ ~ ~ 0.7 1.6;
+                particle minecraft:portal ~ ~ ~ 0.3 0.6 0.3 0.6 40;
+            }
+        }
+        tag @e remove tf2.tele_traveler;
+    }
+
+    function telefrag() {
+        // @s = enemy standing on the exit
+        lookup::damages << {instakill: true, kill_verb: "telefragged"};
+        lookup::damages[-1].cause = tf2.player.id:$traveler_id;
+        lookup::damages[-1].target = tf2.player.id:@s;
+    }
+
+    function sync_upgrades() {
+        // @s = teleporter that just finished building. The pair takes the more upgraded end's state (FindMatch).
+        this.tag_match();
+        execute as @e[tag=tf2.tele_match, tag=!tf2.constructing, limit=1] run {
+            tf2.building.level:$match_level = tf2.building.level:@s;
+            tf2.building.upgrade_metal:$match_metal = tf2.building.upgrade_metal:@s;
+        }
+        if (entity @e[tag=tf2.tele_match, tag=!tf2.constructing]) {
+            $copy = false;
+            if (tf2.building.level:$match_level > tf2.building.level:@s) $copy = true;
+            if (tf2.building.level:$match_level == tf2.building.level:@s && tf2.building.upgrade_metal:$match_metal > tf2.building.upgrade_metal:@s) $copy = true;
+            if ($copy) {
+                tf2.building.level:@s = tf2.building.level:$match_level;
+                tf2.building.upgrade_metal:@s = tf2.building.upgrade_metal:$match_metal;
+                building.apply_level();
+                tf2.health:@s = tf2.max_health:@s;
+            }
+        }
+        tag @e remove tf2.tele_match;
+    }
+
+    function die() {
+        building.destroyed();
+    }
+}

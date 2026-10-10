@@ -1,5 +1,4 @@
-scoreboard players set @s tf2.map 5
-scoreboard players operation @s tf2.batch_number > @e[type=marker,tag=tf2.batch] tf2.batch_number
-scoreboard players add @s tf2.batch_number 1
-execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
-function tf2:session/sync with storage tf2:index
+data modify storage tf2:summon line.X set from entity @s Pos[0]
+data modify storage tf2:summon line.Y set from entity @s Pos[1]
+data modify storage tf2:summon line.Z set from entity @s Pos[2]
+kill @s

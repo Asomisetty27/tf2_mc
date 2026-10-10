@@ -1,2 +1,2 @@
-scoreboard players operation @s tf2.ang_vel_z *= 800 tf2.const
-scoreboard players operation @s tf2.ang_vel_z /= 1000 tf2.const
+scoreboard players operation $mot.distance_z tf2.var = $mot.geo_max_z tf2.var
+scoreboard players operation $mot.distance_z tf2.var -= $mot.min_z tf2.var

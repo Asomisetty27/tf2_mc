@@ -1,3 +1,3 @@
-scoreboard players operation $_temp3_ tf2.var = $_maxRamp_ tf2.var
-scoreboard players remove $_temp3_ tf2.var 100
-scoreboard players operation $_temp3_ tf2.var *= 2 tf2.const
+execute store result storage tf2:vars shells int 1 run scoreboard players get @s tf2.primary_ammo
+data modify storage tf2:actionbar buildings append value {text:" ⁍",color:"gold"}
+data modify storage tf2:actionbar buildings append string storage tf2:vars shells 0

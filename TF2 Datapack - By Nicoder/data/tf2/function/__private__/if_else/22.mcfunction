@@ -1,8 +1,3 @@
-scoreboard players set $add tf2.var 200
-scoreboard players operation $add tf2.var -= @s tf2.building.upgrade_metal
-scoreboard players operation $add tf2.var < 25 tf2.const
-scoreboard players operation $add tf2.var < $metal tf2.var
-scoreboard players operation $metal tf2.var -= $add tf2.var
-scoreboard players operation @s tf2.building.upgrade_metal += $add tf2.var
-particle minecraft:wax_off ~ ~0.6 ~ 0.3 0.3 0.3 0 4
-execute if score @s tf2.building.upgrade_metal matches 200.. run function tf2:building/upgrade
+execute store result storage tf2:summon dispenser.team int 1 run scoreboard players get @s tf2.team
+data modify storage tf2:summon dispenser.level set value 1
+function tf2:building/dispenser/spawn

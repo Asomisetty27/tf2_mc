@@ -1,2 +1,2 @@
-scoreboard players operation $level tf2.var = @s tf2.building.level
-execute on vehicle store result entity @s item.components.minecraft:custom_model_data.floats[0] int 1 run scoreboard players get $level tf2.var
+scoreboard players operation $match_level tf2.building.level = @s tf2.building.level
+scoreboard players operation $match_metal tf2.building.upgrade_metal = @s tf2.building.upgrade_metal

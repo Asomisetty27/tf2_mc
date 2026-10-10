@@ -1,3 +1,2 @@
-scoreboard players set @s tf2.mot_x 0
-scoreboard players set @s tf2.mot_y 0
-scoreboard players set @s tf2.mot_z 0
+$tag @s add tf2.$(kind)_pack
+$data modify entity @s Item.components.minecraft:item_model set value 'tf2:pickup/$(kind)'

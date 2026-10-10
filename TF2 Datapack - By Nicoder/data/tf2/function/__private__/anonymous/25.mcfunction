@@ -1,4 +1,3 @@
-execute store result score $Xf tf2.var run data get entity @s Pos[0] 100
-execute store result score $Yf tf2.var run data get entity @s Pos[1] 100
-execute store result score $Zf tf2.var run data get entity @s Pos[2] 100
-kill
+scoreboard players operation $_clip_ tf2.var = @s tf2.primary_clip
+scoreboard players operation $_maxClip_ tf2.var = @s tf2.primary_maxClip
+scoreboard players operation $_ammo_ tf2.var = @s tf2.primary_ammo

@@ -1,4 +1,4 @@
-scoreboard players operation $mot.distance_head_z tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_head_z tf2.var 1000
-scoreboard players operation $mot.distance_tail_z tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_tail_z tf2.var 1000
+scoreboard players reset @s tf2.team
+scoreboard players reset @s tf2.timer
+function tf2:koth_timer/set_max with storage tf2:index
+function tf2:koth_timer/show with storage tf2:index

@@ -1,4 +1,3 @@
-scoreboard players set $surface_x tf2.var 0
-scoreboard players operation $surface_y tf2.var = @s tf2.collision_y
-scoreboard players set $surface_z tf2.var 0
-function tf2:projectile/roll
+execute store result score $mu tf2.var run data get storage tf2:forces collision_friction 1000
+scoreboard players operation $friction tf2.var *= $mu tf2.var
+scoreboard players operation $friction tf2.var /= 1000 tf2.const

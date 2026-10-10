@@ -1,5 +1,3 @@
-scoreboard players operation $add_amount tf2.var = $percent tf2.var
-scoreboard players operation $add_amount tf2.var *= 200 tf2.const
-scoreboard players operation $add_amount tf2.var /= 100 tf2.const
-scoreboard players operation @s tf2.metal += $add_amount tf2.var
-scoreboard players operation @s tf2.metal < 200 tf2.const
+kill @e[type=arrow,tag=!tf2.projectile]
+execute if predicate tf2:ammo_in_clip run function tf2:weapons/main_fire
+scoreboard players set __if_else__ tf2.var 1

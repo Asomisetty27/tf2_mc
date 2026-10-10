@@ -1,2 +1,2 @@
-function tf2:projectile/impact
-scoreboard players set __if_else__ tf2.var 1
+execute if entity @a[tag=iris.executing,scores={tf2.class=2,tf2.time_scoped=4..}] run function tf2:__private__/if_else/44
+execute if score __if_else__ tf2.var matches 0 run scoreboard players set $_multiplier_ tf2.var 100

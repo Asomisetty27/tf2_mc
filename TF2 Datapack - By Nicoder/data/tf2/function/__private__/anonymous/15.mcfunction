@@ -1,2 +1,2 @@
-execute if entity @s[scores={tf2.team=1}] run function tf2:__private__/if_else/27
-execute if entity @s[scores={tf2.team=2}] run function tf2:__private__/if_else/28
+scoreboard players operation @s tf2.health += $repair tf2.var
+scoreboard players operation @s tf2.health < @s tf2.max_health

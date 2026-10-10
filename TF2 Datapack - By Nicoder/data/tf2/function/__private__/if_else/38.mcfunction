@@ -1,2 +1,5 @@
-execute store result score $angular_speed tf2.var run data get storage tf2:lookup item.components.minecraft:custom_data.projectile.rotation.initial 0.9525
-function tf2:projectile/initial_rotation
+execute if entity @s[tag=tf2.uber_patient] run return fail
+tag @s add tf2.uber_patient
+item replace entity @s armor.head with air
+item replace entity @s armor.chest with air
+item replace entity @s armor.legs with air

@@ -10,13 +10,12 @@ class building {
     function place() {
         // @s = Engineer, $type = building type
         // @within Class.Engineer.place_building()
-        if ($type >= 2) {
-            return run Text.tellraw(@s, "&<yellow, italic>Teleporters aren't in yet.");
-        }
         this.tag_owned();
         $already_built = false;
         if ($type == 0 && entity @e[tag=tf2.owned, tag=tf2.sentry]) $already_built = true;
         if ($type == 1 && entity @e[tag=tf2.owned, tag=tf2.dispenser]) $already_built = true;
+        if ($type == 2 && entity @e[tag=tf2.owned, tag=tf2.tele_entrance]) $already_built = true;
+        if ($type == 3 && entity @e[tag=tf2.owned, tag=tf2.tele_exit]) $already_built = true;
         tag @e remove tf2.owned;
         if ($already_built) {
             return run Text.tellraw(@s, "&<yellow, italic>You already have one of those built. Use the Destruction PDA to remove it first.");
@@ -24,6 +23,7 @@ class building {
 
         $cost = SENTRY_COST;
         if ($type == 1) $cost = DISPENSER_COST;
+        if ($type >= 2) $cost = TELEPORTER_COST;
         if (tf2.metal:@s < $cost) {
             return run Text.tellraw(@s, "&<yellow, italic>Not enough metal. That costs &<$cost>, you have &<tf2.metal:@s>.");
         }
@@ -81,6 +81,11 @@ class building {
             summon::dispenser.team = tf2.team:@s;
             summon::dispenser.level = 1;
             building.dispenser.spawn();
+        }
+        if ($type >= 2) {
+            summon::teleporter.team = tf2.team:@s;
+            summon::teleporter.level = 1;
+            building.teleporter.spawn();
         }
         index::i = tf2.batch_number:@s;
         execute as @e[type=item_display, tag=tf2.just_spawned] run {
@@ -145,6 +150,7 @@ class building {
 
         $total = EVAL(SENTRY_BUILD_TICKS * 10);
         if (entity @s[tag=tf2.dispenser]) $total = EVAL(DISPENSER_BUILD_TICKS * 10);
+        if (entity @s[tag=tf2.teleporter]) $total = EVAL(TELEPORTER_BUILD_TICKS * 10);
         tf2.building.progress:@s < $total;
 
         // Health climbs with progress; damage taken while building is kept
@@ -176,6 +182,10 @@ class building {
             $total = EVAL(DISPENSER_BUILD_TICKS * 10);
             $height = 1750;
         }
+        if (entity @s[tag=tf2.teleporter]) {
+            $total = EVAL(TELEPORTER_BUILD_TICKS * 10);
+            $height = 750;
+        }
         $depth := ($total - tf2.building.progress:@s) * $height / $total;
         $depth *= -1;
         @s::transformation.translation[1] = 0.001 * (float) $depth;
@@ -194,6 +204,8 @@ class building {
         tf2.primary_ammo:@s[tag=tf2.sentry] = tf2.primary_maxAmmo:@s;
         tf2.building.metal:@s[tag=tf2.dispenser] = DISPENSER_START_METAL;
         tf2.building.ticks_idle:@s = 0;
+        tf2.attack_delay:@s[tag=tf2.teleporter] = 0;
+        execute if entity @s[tag=tf2.teleporter] run building.teleporter.sync_upgrades();
         playsound minecraft:block.beacon.activate block @a ~ ~ ~ 0.5 1.6;
     }
 
@@ -210,18 +222,27 @@ class building {
 
         $metal = tf2.metal:@e[type=#tf2:player_like, tag=iris.executing, limit=1];
         $did_work = false;
+        $ratio = WRENCH_HP_PER_METAL;
+        if (entity @s[tag=tf2.teleporter]) {
+            $ratio = TELEPORTER_HP_PER_METAL;
+            building.teleporter.tag_match();
+            tag @e[tag=tf2.tele_match, tag=tf2.constructing] remove tf2.tele_match;
+        }
 
         $repair := tf2.max_health:@s - tf2.health:@s;
         if ($repair > 0) {
-            $repair < WRENCH_REPAIR_PER_HIT;
-            $affordable := $metal * WRENCH_HP_PER_METAL;
-            $repair < $affordable;
-            $cost := ($repair + WRENCH_HP_PER_METAL - 1) / WRENCH_HP_PER_METAL;
-            tf2.health:@s += $repair;
-            $metal -= $cost;
-            if ($repair > 0) {
-                $did_work = true;
-                particle minecraft:happy_villager ~ ~0.6 ~ 0.3 0.3 0.3 0 6;
+            this.repair_with_metal();
+            // a repaired teleporter heals its partner by the same amount for free
+            execute as @e[tag=tf2.tele_match] run {
+                tf2.health:@s += $repair;
+                tf2.health:@s < tf2.max_health:@s;
+            }
+        }
+        // hitting a full teleporter repairs its partner instead
+        if (!$did_work && entity @e[tag=tf2.tele_match]) {
+            execute as @e[tag=tf2.tele_match] run {
+                $repair := tf2.max_health:@s - tf2.health:@s;
+                if ($repair > 0) building.repair_with_metal();
             }
         }
 
@@ -232,8 +253,10 @@ class building {
             $metal -= $add;
             tf2.building.upgrade_metal:@s += $add;
             particle minecraft:wax_off ~ ~0.6 ~ 0.3 0.3 0.3 0 4;
+            tf2.building.upgrade_metal:@e[tag=tf2.tele_match] = tf2.building.upgrade_metal:@s;
             if (tf2.building.upgrade_metal:@s >= UPGRADE_METAL) {
                 this.upgrade();
+                execute as @e[tag=tf2.tele_match] at @s run building.upgrade();
             }
         }
 
@@ -246,7 +269,25 @@ class building {
         }
 
         tf2.metal:@e[type=#tf2:player_like, tag=iris.executing, limit=1] = $metal;
+        tag @e remove tf2.tele_match;
         playsound minecraft:block.smithing_table.use block @a ~ ~ ~ 0.5 1.5;
+    }
+
+    function repair_with_metal() {
+        // @s = building missing $repair health. Spends $metal at $ratio hp per metal (Command_Repair).
+        $repair < WRENCH_REPAIR_PER_HIT;
+        $affordable := $metal * $ratio;
+        $repair < $affordable;
+        $cost := ($repair + $ratio - 1) / $ratio;
+        // like Command_Repair, the hp restored is the metal spent times the ratio (102 hp -> 21 metal -> 105 hp at 5:1)
+        $repair := $cost * $ratio;
+        tf2.health:@s += $repair;
+        tf2.health:@s < tf2.max_health:@s;
+        $metal -= $cost;
+        if ($repair > 0) {
+            $did_work = true;
+            particle minecraft:happy_villager ~ ~0.6 ~ 0.3 0.3 0.3 0 6;
+        }
     }
 
     function upgrade() {
@@ -269,6 +310,10 @@ class building {
                 run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Sentry Gun was destroyed!");
         execute if entity @s[tag=tf2.dispenser]
                 run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Dispenser was destroyed!");
+        execute if entity @s[tag=tf2.tele_entrance]
+                run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Teleporter Entrance was destroyed!");
+        execute if entity @s[tag=tf2.tele_exit]
+                run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Teleporter Exit was destroyed!");
         tag @a remove tf2.owner;
         execute on vehicle run kill @s;
         kill @s;
@@ -287,12 +332,13 @@ class building {
         $found = false;
         if ($type == 0) $found = execute if entity @e[tag=tf2.owned, tag=tf2.sentry];
         if ($type == 1) $found = execute if entity @e[tag=tf2.owned, tag=tf2.dispenser];
+        if ($type == 2) $found = execute if entity @e[tag=tf2.owned, tag=tf2.tele_entrance];
+        if ($type == 3) $found = execute if entity @e[tag=tf2.owned, tag=tf2.tele_exit];
         if ($type == 0) execute as @e[tag=tf2.owned, tag=tf2.sentry] at @s run this.destroyed();
         if ($type == 1) execute as @e[tag=tf2.owned, tag=tf2.dispenser] at @s run this.destroyed();
+        if ($type == 2) execute as @e[tag=tf2.owned, tag=tf2.tele_entrance] at @s run this.destroyed();
+        if ($type == 3) execute as @e[tag=tf2.owned, tag=tf2.tele_exit] at @s run this.destroyed();
         tag @e remove tf2.owned;
-        if ($type >= 2) {
-            return run Text.tellraw(@s, "&<yellow, italic>Teleporters aren't in yet.");
-        }
         if (!$found) {
             Text.tellraw(@s, "&<yellow, italic>You don't have one of those built.");
         }
@@ -316,6 +362,14 @@ class building {
             actionbar::buildings << vars::level[0:];
             this.status_line();
         }
+        execute as @e[tag=tf2.owned, tag=tf2.tele_entrance, limit=1] run {
+            actionbar::buildings << {text: "  Tele In", color: "gray"};
+            this.status_line();
+        }
+        execute as @e[tag=tf2.owned, tag=tf2.tele_exit, limit=1] run {
+            actionbar::buildings << {text: "  Tele Out", color: "gray"};
+            this.status_line();
+        }
         tag @e remove tf2.owned;
     }
     function status_line() {
@@ -323,6 +377,7 @@ class building {
         if (entity @s[tag=tf2.constructing]) return run {
             $total = EVAL(SENTRY_BUILD_TICKS * 10);
             if (entity @s[tag=tf2.dispenser]) $total = EVAL(DISPENSER_BUILD_TICKS * 10);
+            if (entity @s[tag=tf2.teleporter]) $total = EVAL(TELEPORTER_BUILD_TICKS * 10);
             $percent := tf2.building.progress:@s * 100 / $total;
             vars::percent = $percent;
             actionbar::buildings << {text: " building ", color: "yellow"};

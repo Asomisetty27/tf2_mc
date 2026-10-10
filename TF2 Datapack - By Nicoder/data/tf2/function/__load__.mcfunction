@@ -189,6 +189,8 @@ scoreboard objectives add tf2.building.boost dummy
 scoreboard objectives add tf2.building.granted_hp dummy
 scoreboard objectives add tf2.building.upgrade_metal dummy
 scoreboard objectives add tf2.building.metal dummy
+scoreboard objectives add tf2.building.tele_timer dummy
+scoreboard objectives add tf2.building.tele_player dummy
 scoreboard objectives add tf2.health dummy "\u2764"
 scoreboard objectives setdisplay below_name tf2.health
 scoreboard objectives add tf2.queue_type trigger

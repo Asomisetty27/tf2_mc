@@ -81,6 +81,14 @@ class Game:
             self.r(f"scoreboard players set {sel} tf2.metal {metal}")
         return sel
 
+    def near(self, sel, x, y, z, r=0.15):
+        return self.count(f"{sel.rstrip(']')},x={x},y={y},z={z},distance=..{r}]") == 1
+
+    def yaw(self, sel):
+        out = self.r(f"data get entity {sel} Rotation[0]")
+        m = re.search(r"(-?[\d.]+)f?$", out.strip())
+        return round(float(m.group(1))) if m else None
+
     def reset(self):
         self.r("kill @e[tag=t.e]")
         self.r("kill @e[type=item_display,predicate=tf2:is_a_building]")
@@ -330,6 +338,114 @@ def test_integration(g):
     check("and the dispenser", g.count("@e[type=item_display,tag=tf2.dispenser]"), 0)
 
 
+def test_teleporters(g):
+    print("Teleporters: build, send, recharge, who can use it, telefrag, shared repair and upgrades")
+    g.reset()
+    eng = g.villager("t.eng", 0.5, 0.5, pid=9001, metal=200)
+    entrance = "@e[type=item_display,tag=tf2.tele_entrance,limit=1]"
+    exit_ = "@e[type=item_display,tag=tf2.tele_exit,limit=1]"
+    g.build(eng, 2)
+    check("entrance placed", g.count("@e[type=item_display,tag=tf2.tele_entrance]"), 1)
+    check("entrance costs 50", g.score(eng, "tf2.metal"), 150)
+    g.build(eng, 2)
+    check("only one entrance", g.count("@e[type=item_display,tag=tf2.tele_entrance]"), 1)
+    g.ticks(415)
+    check("still building at 20.75 s", g.count("@e[tag=tf2.tele_entrance,tag=tf2.constructing]"), 1)
+    g.ticks(6)
+    check("entrance finished after 21 s", g.count("@e[tag=tf2.tele_entrance,tag=tf2.constructing]"), 0)
+
+    traveler = g.villager("t.trav", 0.5, 2.1, cls=MEDIC, pid=9020)
+    g.ticks(15)
+    check("no exit yet: nobody is sent", g.near(traveler, 0.5, Y, 2.1), True)
+
+    # exit 8 blocks east, built facing west (yaw 90)
+    g.r(f"tp {eng} 8.5 {Y} 0.5 90 0")
+    g.build(eng, 3)
+    check("exit costs 50", g.score(eng, "tf2.metal"), 100)
+    check("exit faces the way the engineer faced", g.yaw(exit_), 90)
+    g.r(f"scoreboard players set {exit_} tf2.building.progress 99999")
+    g.ticks(1)
+    g.ticks(6)
+    check("not there yet 0.3 s after stepping on", g.near(traveler, 0.5, Y, 2.1), True)
+    g.ticks(2)
+    check("arrives at the exit after 0.35 s", g.near(traveler, 6.9, Y + 0.248, 0.5), True)
+    check("facing the exit's direction", g.yaw(traveler), 90)
+    check_range("entrance recharging 10 s + 0.5 s at level 1", g.score(entrance, "tf2.attack_delay"), 200, 205)
+
+    second = g.villager("t.second", 0.5, 2.1, cls=MEDIC, pid=9021)
+    g.ticks(150)
+    check("second player waits for the recharge", g.near(second, 0.5, Y, 2.1), True)
+    g.ticks(70)
+    check("then gets sent", g.near(second, 6.9, Y + 0.248, 0.5), True)
+    g.r("kill @e[tag=t.second]")
+    g.r("kill @e[tag=t.trav]")
+    g.r(f"scoreboard players set {entrance} tf2.attack_delay 0")
+
+    enemy = g.villager("t.enemy", 0.5, 2.1, cls=MEDIC, team=2, pid=9022)
+    g.ticks(15)
+    check("enemies can't use it", g.near(enemy, 0.5, Y, 2.1), True)
+    g.r(f"scoreboard players set {enemy} tf2.class {SPY}")
+    g.ticks(10)
+    check("enemy Spies can (PlayerCanBeTeleported)", g.near(enemy, 6.9, Y + 0.248, 0.5), True)
+    g.r("kill @e[tag=t.enemy]")
+    g.r(f"scoreboard players set {entrance} tf2.attack_delay 0")
+
+    # telefrag: run the arrival step by hand so the damage queue can be read before the tick consumes it
+    camper = g.villager("t.camper", 6.9, 0.5, cls=MEDIC, team=2, pid=9023)
+    traveler = g.villager("t.trav", 0.5, 4.5, cls=MEDIC, pid=9024)
+    g.r(f"scoreboard players set {entrance} tf2.building.tele_player 9024")
+    g.r(f"execute as {entrance} at @s run function tf2:building/teleporter/tag_match")
+    g.r(f"execute as {entrance} at @s run function tf2:building/teleporter/arrive")
+    g.r("tag @e remove tf2.tele_match")
+    check("enemy on the exit gets telefragged", "telefragged" in g.r("data get storage tf2:lookup damages[-1].kill_verb"), True)
+    check("killed by the arriving player", "9024" in g.r("data get storage tf2:lookup damages[-1].cause"), True)
+    check("victim is the camper", "9023" in g.r("data get storage tf2:lookup damages[-1].target"), True)
+    g.ticks(1)
+    g.r("kill @e[tag=t.camper]")
+    g.r("kill @e[tag=t.trav]")
+
+    g.r(f"tp {eng} 0.5 {Y} 4")
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    g.r(f"scoreboard players set {entrance} tf2.health 40")
+    g.r(f"scoreboard players set {exit_} tf2.health 100")
+    g.wrench(eng, entrance)
+    check("teleporter repair: 21 metal buys 105 hp (5 hp per metal)", g.score(entrance, "tf2.health"), 145)
+    check("costs 21 metal", g.score(eng, "tf2.metal"), 179)
+    check("the exit is healed by the same amount for free", g.score(exit_, "tf2.health"), 150)
+    g.wrench(eng, entrance)
+    g.r(f"scoreboard players set {exit_} tf2.health 50")
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    g.wrench(eng, entrance)
+    check("hitting a full entrance repairs the exit instead", g.score(exit_, "tf2.health"), 150)
+    check("that costs metal (100 hp -> 20)", g.score(eng, "tf2.metal"), 180)
+
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    for _ in range(7):
+        g.wrench(eng, entrance)
+    check("upgrade progress is shared with the exit", g.score(exit_, "tf2.building.upgrade_metal"), 175)
+    g.wrench(eng, entrance)
+    check("entrance reaches level 2", g.score(entrance, "tf2.building.level"), 2)
+    check("exit upgrades with it", g.score(exit_, "tf2.building.level"), 2)
+    check("exit at level 2 health", g.score(exit_, "tf2.health"), 180)
+
+    traveler = g.villager("t.trav", 0.5, 2.1, cls=MEDIC, pid=9025)
+    g.ticks(10)
+    check_range("level 2 recharge is 5 s + 0.5 s", g.score(entrance, "tf2.attack_delay"), 100, 105)
+    g.r("kill @e[tag=t.trav]")
+
+    g.r(f"scoreboard players set {eng} tf2.destruction 13")
+    g.r(f"execute as {eng} at @s run function tf2:class/engineer/remove_building")
+    check("Destruction PDA removes just the exit", g.count("@e[type=item_display,tag=tf2.tele_exit]"), 0)
+    check("entrance stays", g.count("@e[type=item_display,tag=tf2.tele_entrance]"), 1)
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    g.r(f"tp {eng} 8.5 {Y} 0.5 90 0")
+    g.build(eng, 3)
+    g.r(f"scoreboard players set {exit_} tf2.building.progress 99999")
+    g.ticks(1)
+    check("rebuilt exit takes the pair's level 2 (FindMatch)", g.score(exit_, "tf2.building.level"), 2)
+    check("with level 2 health", g.score(exit_, "tf2.health"), 180)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=25575)
@@ -339,7 +455,7 @@ def main():
     g.r("forceload add -16 -16 16 16")
     g.r("tick freeze")
     try:
-        for test in (test_sentry_construction, test_wrench, test_dispenser, test_destruction, test_integration):
+        for test in (test_sentry_construction, test_wrench, test_dispenser, test_destruction, test_integration, test_teleporters):
             test(g)
     finally:
         g.reset()

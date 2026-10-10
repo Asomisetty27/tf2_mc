@@ -4,7 +4,7 @@ kill @e[type=villager,tag=tf2.current]
 execute if score $winner tf2.var matches 1 run tellraw @a[tag=tf2.current] ["",{"text":"MATCH ","color":"yellow","type":"text"},{"text":"| ","color":"white","type":"text"},{"text":"RED wins!","color":"red","bold":true,"italic":true,"type":"text"}]
 execute if score $winner tf2.var matches 2 run tellraw @a[tag=tf2.current] ["",{"text":"MATCH ","color":"yellow","type":"text"},{"text":"| ","color":"white","type":"text"},{"text":"BLU wins!","color":"blue","bold":true,"italic":true,"type":"text"}]
 execute if score $winner tf2.var matches -1 run tellraw @a[tag=tf2.current] {"text":"Stalemate....","color":"gray","italic":true,"hover_event":{"action":"show_text","value":["",{"text":"You're "},{"text":"all","bold":true,"type":"text"},{"text":" losers!","bold":false,"type":"text"}]},"type":"text"}
-execute as @a[tag=tf2.current] run function tf2:__private__/anonymous/35
+execute as @a[tag=tf2.current] run function tf2:__private__/anonymous/43
 scoreboard players set @s tf2.timer -1
 tag @s remove tf2.overtime
 tag @a remove tf2.current

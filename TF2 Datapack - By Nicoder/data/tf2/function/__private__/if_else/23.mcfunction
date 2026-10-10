@@ -1,6 +1,3 @@
-scoreboard players operation $shells tf2.var = @s tf2.primary_maxAmmo
-scoreboard players operation $shells tf2.var -= @s tf2.primary_ammo
-scoreboard players operation $shells tf2.var < 40 tf2.const
-scoreboard players operation $shells tf2.var < $metal tf2.var
-scoreboard players operation @s tf2.primary_ammo += $shells tf2.var
-scoreboard players operation $metal tf2.var -= $shells tf2.var
+execute store result storage tf2:summon teleporter.team int 1 run scoreboard players get @s tf2.team
+data modify storage tf2:summon teleporter.level set value 1
+function tf2:building/teleporter/spawn

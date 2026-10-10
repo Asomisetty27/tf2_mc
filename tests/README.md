@@ -10,7 +10,7 @@ python3 tests/test_buildings.py --port 25598             # from the repo root, i
 
 After recompiling, run `setup_server.sh` again to copy the new datapack in, then `/reload`.
 
-What it covers (60 checks): placement and metal cost, the one-of-each rule, walls and overlapping buildings, build time and health ramp, wrench construction boost, repair, upgrade and sentry ammo, per-level health and shells, dispenser healing rate, range, line of sight, metal storage and refill timing, Spy cloak, the Destruction PDA, destruction at 0 HP, sentries acquiring targets once built, and buildings blowing up when the Engineer switches class.
+What it covers (93 checks): placement and metal cost, the one-of-each rule, walls and overlapping buildings, build time and health ramp, wrench construction boost, repair, upgrade and sentry ammo, per-level health and shells, dispenser healing rate, range, line of sight, metal storage and refill timing, Spy cloak, the Destruction PDA, destruction at 0 HP, sentries acquiring targets once built, buildings blowing up when the Engineer switches class, and teleporters (send timing, arrival position and facing, recharge per level, enemy Spies allowed and other enemies not, telefrags, shared repair and upgrades, a rebuilt end inheriting the pair's level).
 
 Not covered: anything that needs a real player (PDA dialogs, HUD, kill feed, ammo pack pickups, void deaths).
 

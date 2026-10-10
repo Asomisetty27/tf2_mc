@@ -1,2 +1,2 @@
-scoreboard players operation $mot.distance_x tf2.var = $mot.geo_max_x tf2.var
-scoreboard players operation $mot.distance_x tf2.var -= $mot.min_x tf2.var
+scoreboard players set $mot.distance_head_z tf2.var 2147483647
+scoreboard players set $mot.distance_tail_z tf2.var 2147483647

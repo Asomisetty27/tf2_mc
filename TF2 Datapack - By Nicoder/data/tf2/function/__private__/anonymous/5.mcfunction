@@ -1,3 +1,2 @@
-execute if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
-execute unless score $placed tf2.var matches 1.. positioned ~ ~-1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
-execute unless score $placed tf2.var matches 1.. positioned ~ ~1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
+tag @s add tf2.tele_entrance
+data modify entity @s CustomName set value 'Teleporter Entrance'
