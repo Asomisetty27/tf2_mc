@@ -1,3 +1,6 @@
-function tf2:weapons/save_arrow_speed
-execute as @e[tag=tf2.self] run function tf2:weapons/main_fire
-kill @s
+scoreboard players operation @s tf2.mot_x *= 600 tf2.const
+scoreboard players operation @s tf2.mot_x /= 1000 tf2.const
+scoreboard players operation @s tf2.mot_y *= 600 tf2.const
+scoreboard players operation @s tf2.mot_y /= 1000 tf2.const
+scoreboard players operation @s tf2.mot_z *= 600 tf2.const
+scoreboard players operation @s tf2.mot_z /= 1000 tf2.const

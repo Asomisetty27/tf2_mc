@@ -46,7 +46,8 @@ Hardcode.repeatList(
         "halt",
         "quaternion_r", "quaternion_i", "quaternion_j", "quaternion_k",
         "ang_vel_x", "ang_vel_y", "ang_vel_z",
-        "building.target", "building.x", "building.y", "building.z", "building.level", "building.ticks_idle", "building.last_yaw", "building.owner"
+        "building.target", "building.x", "building.y", "building.z", "building.level", "building.ticks_idle", "building.last_yaw", "building.owner",
+        "metal", "building.type", "building.progress", "building.boost", "building.granted_hp", "building.upgrade_metal", "building.metal"
     ]
 );
 
@@ -908,6 +909,7 @@ if (!$initialization_complete) {
 $Settings.max_batches < EVAL(_INSTANCES_CAP_ - 1);
 
 // markers keep track of gamestate
+forceload add 0 0;
 $batch_markers = execute if entity @e[type=marker,tag=tf2.batch];
 if ($batch_markers != $Settings.max_batches) setup_markers();
 

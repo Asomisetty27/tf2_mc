@@ -1,2 +1,3 @@
-execute if entity @s[scores={tf2.team=1}] run function tf2:__private__/if_else/15
-execute if entity @s[scores={tf2.team=2}] run function tf2:__private__/if_else/16
+execute if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
+execute unless score $placed tf2.var matches 1.. positioned ~ ~-1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here
+execute unless score $placed tf2.var matches 1.. positioned ~ ~1 ~ if block ~ ~ ~ #tf2:building_passable if block ~ ~1 ~ #tf2:building_passable unless block ~ ~-1 ~ #tf2:building_passable run function tf2:building/place_here

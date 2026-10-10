@@ -1,5 +1,3 @@
-scoreboard players operation @s tf2.mot_x *= -1 tf2.const
-scoreboard players operation @s tf2.mot_z *= -1 tf2.const
-function tf2:projectile/linear_velocity_to_quaternion
-scoreboard players operation @s tf2.mot_x *= -1 tf2.const
-scoreboard players operation @s tf2.mot_z *= -1 tf2.const
+scoreboard players operation @s tf2.secondary_clip = $_clip_ tf2.var
+scoreboard players operation @s tf2.secondary_maxClip = $_maxClip_ tf2.var
+scoreboard players operation @s tf2.secondary_ammo = $_ammo_ tf2.var

@@ -1,3 +1,5 @@
-scoreboard players operation $_clip_ tf2.var = @s tf2.primary_clip
-scoreboard players operation $_maxClip_ tf2.var = @s tf2.primary_maxClip
-scoreboard players operation $_ammo_ tf2.var = @s tf2.primary_ammo
+execute store result entity @s Rotation[0] float 0.01 run scoreboard players get $yaw tf2.var
+scoreboard players operation @s tf2.building.last_yaw = $yaw tf2.var
+execute on vehicle store result entity @s Rotation[0] float 0.01 run scoreboard players get $yaw tf2.var
+function tf2:session/sync with storage tf2:index
+function tf2:building/start_construction

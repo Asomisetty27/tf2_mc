@@ -1,4 +1,4 @@
-execute store result score @s tf2.attack_delay run data get entity @s SelectedItem.components.minecraft:custom_data.attributes.deployTime 10000
-execute unless data entity @s SelectedItem.components.minecraft:custom_data.attributes.deployTime run scoreboard players set @s tf2.attack_delay 10000
-scoreboard players set @s tf2.consecutive_reload 0
-scoreboard players set @s tf2.time_idle 0
+execute store result storage tf2:vars upgrade int 1 run scoreboard players get @s tf2.building.upgrade_metal
+data modify storage tf2:actionbar buildings append value {text:" ⬆",color:"aqua"}
+data modify storage tf2:actionbar buildings append string storage tf2:vars upgrade 0
+data modify storage tf2:actionbar buildings append value {text:"/200",color:"aqua"}

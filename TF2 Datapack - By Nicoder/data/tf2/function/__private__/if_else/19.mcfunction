@@ -1,3 +1,2 @@
-scoreboard players operation $_clip_ tf2.var = @s tf2.secondary_clip
-scoreboard players operation $_maxClip_ tf2.var = @s tf2.secondary_maxClip
-scoreboard players operation $_ammo_ tf2.var = @s tf2.secondary_ammo
+scoreboard players set $total tf2.var 4200
+scoreboard players set $height tf2.var 1750

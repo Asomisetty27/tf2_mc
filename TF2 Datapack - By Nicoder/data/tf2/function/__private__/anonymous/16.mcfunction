@@ -1,5 +1,3 @@
-scoreboard players set @s tf2.map 5
-scoreboard players operation @s tf2.batch_number > @e[type=marker,tag=tf2.batch] tf2.batch_number
-scoreboard players add @s tf2.batch_number 1
-execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
-function tf2:session/sync with storage tf2:index
+execute at @s anchored eyes run particle minecraft:sweep_attack ^ ^ ^1
+execute unless data storage iris:output {TargetType:"ENTITY"} run return run playsound tf2:item.melee.miss player @s ~ ~ ~ 0.35 0.35 0.1
+playsound tf2:item.melee.hit player @s ~ ~ ~ 1.5 0.9 0.1

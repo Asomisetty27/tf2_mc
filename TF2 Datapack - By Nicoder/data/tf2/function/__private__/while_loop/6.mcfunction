@@ -1,34 +1,4 @@
-data modify storage tf2:motion geo set from storage iris:data Shape[-1]
-execute store result score $mot.geo_min_x tf2.var run data get storage tf2:motion geo.min[0] 1000
-scoreboard players operation $mot.geo_min_x tf2.var += $mot.voxel_x tf2.var
-execute store result score $mot.geo_max_x tf2.var run data get storage tf2:motion geo.max[0] 1000
-scoreboard players operation $mot.geo_max_x tf2.var += $mot.voxel_x tf2.var
-execute store result score $mot.geo_min_y tf2.var run data get storage tf2:motion geo.min[1] 1000
-scoreboard players operation $mot.geo_min_y tf2.var += $mot.voxel_y tf2.var
-execute store result score $mot.geo_max_y tf2.var run data get storage tf2:motion geo.max[1] 1000
-scoreboard players operation $mot.geo_max_y tf2.var += $mot.voxel_y tf2.var
-execute store result score $mot.geo_min_z tf2.var run data get storage tf2:motion geo.min[2] 1000
-scoreboard players operation $mot.geo_min_z tf2.var += $mot.voxel_z tf2.var
-execute store result score $mot.geo_max_z tf2.var run data get storage tf2:motion geo.max[2] 1000
-scoreboard players operation $mot.geo_max_z tf2.var += $mot.voxel_z tf2.var
-execute store success score $mot.is_entity tf2.var run data get storage tf2:motion geo{type:"ENTITY"}
-scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_x tf2.var matches 1 run function tf2:__private__/if_else/62
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/63
-scoreboard players operation $mot.distance_x tf2.var *= $mot.distance tf2.var
-scoreboard players operation $mot.distance_x tf2.var /= $mot.motion_x tf2.var
-execute unless score $mot.motion_x tf2.var matches 0 if score $mot.distance_x tf2.var matches 0.. if score $mot.distance_x tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/67
-scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_y tf2.var matches 1 run function tf2:__private__/if_else/68
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/69
-scoreboard players operation $mot.distance_y tf2.var *= $mot.distance tf2.var
-scoreboard players operation $mot.distance_y tf2.var /= $mot.motion_y tf2.var
-execute unless score $mot.motion_y tf2.var matches 0 if score $mot.distance_y tf2.var matches 0.. if score $mot.distance_y tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/73
-scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_z tf2.var matches 1 run function tf2:__private__/if_else/74
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/75
-scoreboard players operation $mot.distance_z tf2.var *= $mot.distance tf2.var
-scoreboard players operation $mot.distance_z tf2.var /= $mot.motion_z tf2.var
-execute unless score $mot.motion_z tf2.var matches 0 if score $mot.distance_z tf2.var matches 0.. if score $mot.distance_z tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/79
-data remove storage iris:data Shape[-1]
-execute if data storage iris:data Shape[] run function tf2:__private__/while_loop/6
+execute store result score $i tf2.door.id run data get storage tf2:lookup events.doors[-1].id
+execute as @e[type=item_display,tag=tf2.door] if score @s tf2.batch_number = $local tf2.batch_number if score @s tf2.door.id = $i tf2.door.id store result score @s tf2.door.state run data get storage tf2:lookup events.doors[-1].state
+data remove storage tf2:lookup events.doors[-1]
+execute if data storage tf2:lookup events.doors[] run function tf2:__private__/while_loop/6

@@ -1,0 +1,2 @@
+scoreboard players operation $owner_id tf2.player.id = @s tf2.player.id
+execute as @e[type=item_display,predicate=tf2:is_a_building] if score @s tf2.building.owner = $owner_id tf2.player.id run tag @s add tf2.owned

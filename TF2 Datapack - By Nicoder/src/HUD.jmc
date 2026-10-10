@@ -14,12 +14,15 @@ class HUD {
             {score: {"name":"@s","objective":"tf2.max_health"}, color: "red", type: "score"}
         ];
         this.check_low_health();
-        actionbar:: += {spacing: [""], clip_ammo: [""], reserve_ammo: [""]};
+        actionbar:: += {spacing: [""], clip_ammo: [""], reserve_ammo: [""], metal: [""], buildings: [""]};
 
         if (!predicate tf2:hide_ammo) {
             this.handle_ammo();
         }
-        Text.actionbar(@s, "&<red>❤ Health:&<reset> &<HUD(health)>&<HUD(spacing)>&<HUD(clip_ammo)> &<dark_gray>&<HUD(reserve_ammo)>");
+        if (tf2.class:@s == Class.ENGINEER) {
+            this.handle_metal();
+        }
+        Text.actionbar(@s, "&<red>❤ Health:&<reset> &<HUD(health)>&<HUD(spacing)>&<HUD(clip_ammo)> &<dark_gray>&<HUD(reserve_ammo)>&<HUD(metal)>&<HUD(buildings)>");
     }
     function handle_ammo() {
         actionbar::spacing = {text: "             ", color: "white"};
@@ -32,6 +35,13 @@ class HUD {
             {score: {"name":"$_ammo_", "objective":"tf2.var"}, type: "score"},
             {text: ")", type: "text"}
         ];
+    }
+    function handle_metal() {
+        actionbar::metal = [
+            {text: "  Metal: ", color: "gray"},
+            {score: {"name":"@s", "objective":"tf2.metal"}, type: "score", color: "white"}
+        ];
+        building.status_hud();
     }
     function damage_numbers() {
         // @within Weapons.main_fire();

@@ -1,4 +1,4 @@
-execute summon marker run function tf2:__private__/anonymous/19 with storage tf2:index
-data remove storage tf2:summon doors[-1]
-scoreboard players add $i tf2.var 1
-execute if data storage tf2:summon doors[] run function tf2:__private__/while_loop/1
+scoreboard players remove $temp tf2.index 10
+execute summon item_display run function tf2:__private__/anonymous/29 with storage tf2:index
+data remove storage tf2:summon objectives[-1]
+execute if data storage tf2:summon objectives[] run function tf2:__private__/while_loop/1

@@ -3,4 +3,6 @@ tag @s add tf2.need_to_switch_away
 scoreboard players set $err tf2.var 0
 execute unless score @s tf2.class matches 8 store result score $err tf2.var run tellraw @s {"text":"ERROR: You can't use buildings if you're not playing as the Engineer.","color":"yellow","italic":true,"type":"text"}
 execute if score $err tf2.var matches 1.. run return fail
-return 100
+scoreboard players operation $type tf2.var = @s tf2.destruction
+scoreboard players operation $type tf2.var %= 10 tf2.const
+return run function tf2:building/detonate_type

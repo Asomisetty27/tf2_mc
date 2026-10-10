@@ -46,7 +46,24 @@
 
 #define SENTRY_RANGE EVAL(1100 * 0.01905)
 #define SENTRY_TURN_LIMIT 1500
-#define DISPENSER_RANGE EVAL(360 * 0.01905)
+// Dispenser range: 64 HU box around its center (CObjectDispenser::GetDispenserRadius), see dispenser.jmc
+
+// Engineer buildings. Numbers from Valve's TF2 source (source-sdk-2013) and the TF2 wiki.
+#define ENGINEER_MAX_METAL 200
+#define SENTRY_COST 130
+#define DISPENSER_COST 100
+#define UPGRADE_METAL 200
+#define UPGRADE_METAL_PER_HIT 25
+#define WRENCH_REPAIR_PER_HIT 102
+#define WRENCH_HP_PER_METAL 3
+#define SENTRY_SHELLS_PER_HIT 40
+// build times in ticks: 10.5 s and 21 s
+#define SENTRY_BUILD_TICKS 210
+#define DISPENSER_BUILD_TICKS 420
+// wrench hits on a building under construction add +1.5x build rate for 1 s (2.5x total)
+#define CONSTRUCTION_BOOST_TICKS 20
+#define DISPENSER_MAX_METAL 400
+#define DISPENSER_START_METAL 25
 
 
 #define GRENADE_EXPLOSION_TIMER 60

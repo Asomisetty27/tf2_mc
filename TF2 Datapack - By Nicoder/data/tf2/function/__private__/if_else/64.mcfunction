@@ -1,2 +1,2 @@
-scoreboard players operation $mot.collision_surface_x tf2.var = $mot.geo_min_x tf2.var
-scoreboard players set __if_else__ tf2.var 1
+scoreboard players set $mot.distance_head_y tf2.var 2147483647
+scoreboard players set $mot.distance_tail_y tf2.var 2147483647

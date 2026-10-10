@@ -1,3 +1,2 @@
-scoreboard players operation $num tf2.var = $y tf2.var
-scoreboard players operation $denom tf2.var = $horizontal tf2.var
-scoreboard players set __if_else__ tf2.var 1
+execute as @e[tag=tf2.self] run function tf2:weapons/main_fire
+kill @s

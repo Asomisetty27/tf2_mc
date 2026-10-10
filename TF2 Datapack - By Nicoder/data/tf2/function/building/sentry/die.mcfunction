@@ -1,2 +1,1 @@
-execute on vehicle run kill @s
-kill @s
+function tf2:building/destroyed

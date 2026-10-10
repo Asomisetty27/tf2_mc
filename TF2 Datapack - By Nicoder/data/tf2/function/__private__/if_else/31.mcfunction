@@ -1,6 +1,3 @@
-scoreboard players operation @s tf2.mot_x *= $elasticity tf2.var
-scoreboard players operation @s tf2.mot_x /= 1000 tf2.const
-scoreboard players operation @s tf2.mot_y *= $elasticity tf2.var
-scoreboard players operation @s tf2.mot_y /= 1000 tf2.const
-scoreboard players operation @s tf2.mot_z *= $elasticity tf2.var
-scoreboard players operation @s tf2.mot_z /= 1000 tf2.const
+scoreboard players operation $_clip_ tf2.var = @s tf2.secondary_clip
+scoreboard players operation $_maxClip_ tf2.var = @s tf2.secondary_maxClip
+scoreboard players operation $_ammo_ tf2.var = @s tf2.secondary_ammo

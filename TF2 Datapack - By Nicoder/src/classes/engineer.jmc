@@ -33,16 +33,14 @@ make_weapon(
 JMC.python(`
 make_weapon(
     Class.ENGINEER, slot=3, 
-    name='Construction PDA',
-    display_name="Construction PDA (doesn't work yet)"
+    name='Construction PDA'
 )
 `, jmc=true);
 
 JMC.python(`
 make_weapon(
     Class.ENGINEER, slot=4, 
-    name='Destruction PDA',
-    display_name="Destruction PDA (doesn't work yet)"
+    name='Destruction PDA'
 )
 `, jmc=true);
 
@@ -103,6 +101,7 @@ class Class.Engineer {
     function give() {
         tf2.class:@s = Class.ENGINEER;
 		tf2.max_health:@s = tf2.health:@s = 125;
+		tf2.metal:@s = ENGINEER_MAX_METAL;
 		attribute @s minecraft:movement_speed base set BASE_SPEED;
 
         clear @s;
@@ -227,9 +226,9 @@ class Class.Engineer {
 
         if ($err) {return fail;}
 
-        // WIP
-        JMC.log("TODO Building placement");
-        return 100;
+        // trigger value is type + 10 * team, see the dialog above
+        $type := tf2.construction:@s % 10;
+        return run building.place();
     }
     function remove_building() {
         tag @s remove tf2.in_destruction_menu;
@@ -241,10 +240,9 @@ class Class.Engineer {
 
         if ($err) {return fail;}
 
-        // WIP
-        JMC.log("TODO Building destruction");
-        // kill building and give back metal based on its level and type
-        return 100;
+        // No metal back, same as TF2
+        $type := tf2.destruction:@s % 10;
+        return run building.detonate_type();
     }
 }
 

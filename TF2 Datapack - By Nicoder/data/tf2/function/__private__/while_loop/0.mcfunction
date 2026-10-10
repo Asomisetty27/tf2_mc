@@ -1,4 +1,9 @@
-scoreboard players remove $temp tf2.index 10
-execute summon item_display run function tf2:__private__/anonymous/18 with storage tf2:index
-data remove storage tf2:summon objectives[-1]
-execute if data storage tf2:summon objectives[] run function tf2:__private__/while_loop/0
+tag @n[tag=tf2.dispenser_candidate] add tf2.los_checking
+tag @e[tag=tf2.dispenser_candidate,tag=!tf2.los_checking] add tf2.los_ignore
+execute at @s positioned ~ ~.25 ~ facing entity @n[tag=tf2.los_checking] eyes run function tf2:raycast/informational
+tag @e[tag=tf2.los_checking,tag=iris.targeted_entity] add tf2.ally_in_range
+tag @e[tag=tf2.dispenser_candidate,tag=!tf2.los_checking] remove tf2.los_ignore
+tag @e[tag=tf2.los_checking] add tf2.los_ignore
+tag @e[tag=tf2.los_checking] remove tf2.dispenser_candidate
+tag @e[tag=tf2.los_checking] remove tf2.los_checking
+execute if entity @e[tag=tf2.dispenser_candidate] run function tf2:__private__/while_loop/0

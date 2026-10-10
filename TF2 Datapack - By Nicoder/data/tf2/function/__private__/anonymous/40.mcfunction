@@ -1,2 +1,3 @@
-$execute store result score @s[scores={tf2.team=1}] tf2.respawn_timer run data get storage tf2:running_games $(i).spawn_time.red[0] 20
-$execute store result score @s[scores={tf2.team=2}] tf2.respawn_timer run data get storage tf2:running_games $(i).spawn_time.blu[0] 20
+scoreboard players set @s tf2.mot_x 0
+scoreboard players set @s tf2.mot_y 0
+scoreboard players set @s tf2.mot_z 0

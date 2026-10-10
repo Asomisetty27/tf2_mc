@@ -1,4 +1,5 @@
-scoreboard players reset @s tf2.team
-scoreboard players reset @s tf2.timer
-function tf2:koth_timer/set_max with storage tf2:index
-function tf2:koth_timer/show with storage tf2:index
+scoreboard players operation @s tf2.mot_x *= -1 tf2.const
+scoreboard players operation @s tf2.mot_z *= -1 tf2.const
+function tf2:projectile/linear_velocity_to_quaternion
+scoreboard players operation @s tf2.mot_x *= -1 tf2.const
+scoreboard players operation @s tf2.mot_z *= -1 tf2.const

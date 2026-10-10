@@ -1,2 +1,3 @@
-execute if entity @a[tag=iris.executing,scores={tf2.class=2,tf2.time_scoped=4..}] run function tf2:__private__/if_else/23
-execute if score __if_else__ tf2.var matches 0 run scoreboard players set $_multiplier_ tf2.var 100
+execute store result storage tf2:vars shells int 1 run scoreboard players get @s tf2.primary_ammo
+data modify storage tf2:actionbar buildings append value {text:" ⁍",color:"gold"}
+data modify storage tf2:actionbar buildings append string storage tf2:vars shells 0

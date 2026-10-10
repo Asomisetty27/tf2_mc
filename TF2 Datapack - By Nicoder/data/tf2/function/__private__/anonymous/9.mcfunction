@@ -1,4 +1,2 @@
-data modify storage tf2:summon line.X set from entity @s Pos[0]
-data modify storage tf2:summon line.Y set from entity @s Pos[1]
-data modify storage tf2:summon line.Z set from entity @s Pos[2]
-kill @s
+execute store result entity @s transformation.translation[1] float 0.001 run scoreboard players get $depth tf2.var
+data modify entity @s start_interpolation set value 0

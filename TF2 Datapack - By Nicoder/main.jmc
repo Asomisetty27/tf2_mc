@@ -67,6 +67,8 @@ function __tick__() {
     if ($flicker == 0) {
         execute as @e[type=!#tf2:player_like] 
                 run Session.check_validity();
+        $batch_markers = execute if entity @e[type=marker,tag=tf2.batch];
+        if ($batch_markers != $Settings.max_batches) setup_markers();
     }
 
     while (lookup::damages[]) {
@@ -81,7 +83,7 @@ class Damage {
         $cause  = lookup::damages[-1].cause;
         $target = lookup::damages[-1].target;
         $amount = lookup::damages[-1].amount;
-        $instakill = lookup::damage[-1].instakill;
+        $instakill = lookup::damages[-1].instakill;
 
         execute as @a[tag=tf2.is_playing]
                 if score @s tf2.player.id
@@ -129,7 +131,7 @@ class Damage {
                 if score @s tf2.player.id
                 = $cause tf2.var
                 run tag @s add tf2.cause;
-        execute as @n[predicate=tf2:is_a_building]
+        execute as @e[type=item_display, predicate=tf2:is_a_building]
                 if score @s tf2.player.id
                 = $cause tf2.var
                 run tag @s add tf2.cause;
@@ -265,6 +267,8 @@ class Pickup {
                 if score @s tf2.secondary_clip = @s tf2.secondary_maxClip
                 run tag @s add tf2.ineligible;
         tag @a[scores={tf2.class=Class.SPY, tf2.cloak=..599}] remove tf2.ineligible;
+        execute if entity @s[tag=tf2.ammo_pack]
+                run tag @a[scores={tf2.class=Class.ENGINEER, tf2.metal=..199}] remove tf2.ineligible;
         tag @a[gamemode=spectator] add tf2.ineligible;
         tag @a[distance=..1.25,limit=1,sort=nearest,tag=!tf2.ineligible] add tf2.recipient;
         tag @a remove tf2.ineligible;
@@ -316,6 +320,12 @@ class Pickup {
         $add_amount -= $clip_space;
         tf2.secondary_ammo:@s += $add_amount;
         tf2.secondary_ammo:@s < tf2.secondary_maxAmmo:@s;
+
+        if (tf2.class:@s == Class.ENGINEER) {
+            $add_amount := $percent * ENGINEER_MAX_METAL / 100;
+            tf2.metal:@s += $add_amount;
+            tf2.metal:@s < ENGINEER_MAX_METAL;
+        }
 
         if (tf2.class:@s != Class.SPY) {
             return 1;

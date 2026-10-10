@@ -1,3 +1,2 @@
-kill @e[type=arrow,tag=!tf2.projectile]
-execute if predicate tf2:ammo_in_clip run function tf2:weapons/main_fire
-scoreboard players set __if_else__ tf2.var 1
+scoreboard players operation @s tf2.ang_vel_x *= 800 tf2.const
+scoreboard players operation @s tf2.ang_vel_x /= 1000 tf2.const

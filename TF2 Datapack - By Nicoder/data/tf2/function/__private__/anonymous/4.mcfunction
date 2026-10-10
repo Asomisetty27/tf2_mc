@@ -1,2 +1,2 @@
-function iris:set_coordinates/main
-tag @s add tf2.temp
+execute as @e[type=#tf2:player_like,dx=2.4384,dy=2.4384,dz=2.4384,tag=!tf2.dead] unless entity @s[gamemode=spectator] if score @s tf2.team = $temp tf2.team run tag @s add tf2.dispenser_candidate
+execute as @e[type=#tf2:player_like,dx=2.4384,dy=2.4384,dz=2.4384,tag=!tf2.dead,tag=tf2.disguised] unless entity @s[gamemode=spectator] if score @s tf2.disguise.team = $temp tf2.team run tag @s add tf2.dispenser_candidate

@@ -1,3 +1,4 @@
-execute if entity @s[tag=!tf2.has_hit_wall,tag=!tf2.sticky] run return run function tf2:grenade/explode
-execute if entity @s[tag=!tf2.has_hit_object] run function tf2:__private__/anonymous/30
-tag @s add tf2.has_hit_object
+data modify entity @s Pos set from storage tf2:summon pickups[-1].Pos
+scoreboard players operation @s tf2.batch_number = $local tf2.batch_number
+tag @s remove tf2.new
+function tf2:session/sync with storage tf2:index

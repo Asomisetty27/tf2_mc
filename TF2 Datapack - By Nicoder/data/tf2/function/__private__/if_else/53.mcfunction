@@ -1,4 +1,2 @@
-scoreboard players operation $mot.distance_head_z tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_head_z tf2.var 1000
-scoreboard players operation $mot.distance_tail_z tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_tail_z tf2.var 1000
+execute as @e[type=#tf2:player_like,tag=tf2.in_queue,scores={tf2.queue_type=2,tf2.batch_number=0},limit=24,sort=random] run function tf2:start_game/as_players/generic
+scoreboard players set __if_else__ tf2.var 1

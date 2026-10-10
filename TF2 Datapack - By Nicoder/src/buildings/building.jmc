@@ -1,0 +1,348 @@
+// Logic shared by every Engineer building: placement, construction, per-level stats,
+// wrench hits (repair / upgrade / ammo), and destruction.
+// Building types match the PDA dialog order: 0 = Sentry, 1 = Dispenser, 2/3 = Teleporters
+
+new tags.block(building_passable) {
+    "values": ["#minecraft:air", "#minecraft:replaceable", "minecraft:light"]
+}
+
+class building {
+    function place() {
+        // @s = Engineer, $type = building type
+        // @within Class.Engineer.place_building()
+        if ($type >= 2) {
+            return run Text.tellraw(@s, "&<yellow, italic>Teleporters aren't in yet.");
+        }
+        this.tag_owned();
+        $already_built = false;
+        if ($type == 0 && entity @e[tag=tf2.owned, tag=tf2.sentry]) $already_built = true;
+        if ($type == 1 && entity @e[tag=tf2.owned, tag=tf2.dispenser]) $already_built = true;
+        tag @e remove tf2.owned;
+        if ($already_built) {
+            return run Text.tellraw(@s, "&<yellow, italic>You already have one of those built. Use the Destruction PDA to remove it first.");
+        }
+
+        $cost = SENTRY_COST;
+        if ($type == 1) $cost = DISPENSER_COST;
+        if (tf2.metal:@s < $cost) {
+            return run Text.tellraw(@s, "&<yellow, italic>Not enough metal. That costs &<$cost>, you have &<tf2.metal:@s>.");
+        }
+        if (entity @s[tag=tf2.in_spawn]) {
+            return run Text.tellraw(@s, "&<yellow, italic>You can't build inside a spawn room.");
+        }
+
+        // Look for floor 1.6 blocks in front of the Engineer: level ground first, then one step down, then one step up
+        $yaw = @s::Rotation[0] * 100;
+        $placed = false;
+        execute rotated ~ 0 positioned ^ ^ ^1.6 align y run {
+            execute if block ~ ~ ~ #tf2:building_passable
+                    if block ~ ~1 ~ #tf2:building_passable
+                    unless block ~ ~-1 ~ #tf2:building_passable
+                    run building.place_here();
+            if (!$placed) {
+                execute positioned ~ ~-1 ~
+                        if block ~ ~ ~ #tf2:building_passable
+                        if block ~ ~1 ~ #tf2:building_passable
+                        unless block ~ ~-1 ~ #tf2:building_passable
+                        run building.place_here();
+            }
+            if (!$placed) {
+                execute positioned ~ ~1 ~
+                        if block ~ ~ ~ #tf2:building_passable
+                        if block ~ ~1 ~ #tf2:building_passable
+                        unless block ~ ~-1 ~ #tf2:building_passable
+                        run building.place_here();
+            }
+        }
+        if ($placed == 2) {
+            return run Text.tellraw(@s, "&<yellow, italic>Too close to another building.");
+        }
+        if (!$placed) {
+            return run Text.tellraw(@s, "&<yellow, italic>Can't build there. Face open, flat ground.");
+        }
+
+        tf2.metal:@s -= $cost;
+        return 1;
+    }
+    function place_here() {
+        // @s = Engineer, positioned at the chosen floor spot
+        if (entity @e[type=item_display, predicate=tf2:is_a_building, distance=..1.25]) return run {
+            $placed = 2;
+            return fail;
+        }
+        $placed = true;
+
+        if ($type == 0) {
+            summon::sentry.team = tf2.team:@s;
+            summon::sentry.level = 1;
+            building.sentry.spawn();
+        }
+        if ($type == 1) {
+            summon::dispenser.team = tf2.team:@s;
+            summon::dispenser.level = 1;
+            building.dispenser.spawn();
+        }
+        index::i = tf2.batch_number:@s;
+        execute as @e[type=item_display, tag=tf2.just_spawned] run {
+            @s::Rotation[0] = 0.01 * (float) $yaw;
+            tf2.building.last_yaw:@s = $yaw;
+            execute on vehicle run @s::Rotation[0] = 0.01 * (float) $yaw;
+            Session.sync() with index::;
+            building.start_construction();
+        }
+        playsound minecraft:block.anvil.place block @a ~ ~ ~ 0.6 1.4;
+    }
+
+    function tag_owned() {
+        // Tags every building owned by @s with tf2.owned
+        tf2.player.id:$owner_id = tf2.player.id:@s;
+        execute as @e[type=item_display, predicate=tf2:is_a_building]
+                if score @s tf2.building.owner = $owner_id tf2.player.id
+                run tag @s add tf2.owned;
+    }
+
+    function apply_level() {
+        // @s = building. Max health from Valve's source: 150 / 180 / 216
+        tf2.max_health:@s = 150;
+        tf2.max_health:@s[scores={tf2.building.level=2}] = 180;
+        tf2.max_health:@s[scores={tf2.building.level=3}] = 216;
+
+        // Sentry shells: 150 at level 1, 200 at levels 2 and 3
+        tf2.primary_maxAmmo:@s[tag=tf2.sentry] = 150;
+        tf2.primary_maxAmmo:@s[tag=tf2.sentry, scores={tf2.building.level=2..}] = 200;
+
+        @s::item.components."minecraft:custom_model_data".floats[1] = tf2.building.level:@s;
+        execute if entity @s[tag=tf2.sentry] run {
+            $level = tf2.building.level:@s;
+            execute on vehicle run @s::item.components."minecraft:custom_model_data".floats[0] = $level;
+        }
+    }
+
+    function start_construction() {
+        // @s = freshly spawned building
+        tag @s remove tf2.just_spawned;
+        tag @s add tf2.constructing;
+        tf2.building.progress:@s = 0;
+        tf2.building.boost:@s = 0;
+        tf2.building.granted_hp:@s = 0;
+        tf2.building.upgrade_metal:@s = 0;
+        tf2.health:@s = 1;
+        tf2.primary_ammo:@s = 0;
+        @s::interpolation_duration = 2;
+        execute on vehicle run @s::interpolation_duration = 2;
+        this.construction_visual();
+    }
+
+    function construction_tick() {
+        // @s = building with tag tf2.constructing
+        // Progress counts in tenths of a tick so a 2.5x wrench boost stays an integer
+        $rate = 10;
+        if (tf2.building.boost:@s > 0) {
+            $rate = 25;
+            tf2.building.boost:@s--;
+        }
+        tf2.building.progress:@s += $rate;
+
+        $total = EVAL(SENTRY_BUILD_TICKS * 10);
+        if (entity @s[tag=tf2.dispenser]) $total = EVAL(DISPENSER_BUILD_TICKS * 10);
+        tf2.building.progress:@s < $total;
+
+        // Health climbs with progress; damage taken while building is kept
+        $granted := tf2.max_health:@s * tf2.building.progress:@s / $total;
+        $gain := $granted - tf2.building.granted_hp:@s;
+        tf2.health:@s += $gain;
+        tf2.building.granted_hp:@s = $granted;
+        tf2.health:@s < tf2.max_health:@s;
+
+        $visual_tick := xrroou1m8_p_join:$__global__ % 2;
+        if ($visual_tick == 0) {
+            this.construction_visual();
+        }
+        $particle_tick := xrroou1m8_p_join:$__global__ % 10;
+        if ($particle_tick == 0) {
+            particle minecraft:crit ~ ~0.4 ~ 0.3 0.2 0.3 0 3;
+        }
+
+        if (tf2.building.progress:@s >= $total) {
+            this.finish_construction();
+        }
+    }
+
+    function construction_visual() {
+        // Raise the model out of the floor as construction progresses
+        $total = EVAL(SENTRY_BUILD_TICKS * 10);
+        $height = 1250;
+        if (entity @s[tag=tf2.dispenser]) {
+            $total = EVAL(DISPENSER_BUILD_TICKS * 10);
+            $height = 1750;
+        }
+        $depth := ($total - tf2.building.progress:@s) * $height / $total;
+        $depth *= -1;
+        @s::transformation.translation[1] = 0.001 * (float) $depth;
+        @s::start_interpolation = 0;
+        execute on vehicle run {
+            @s::transformation.translation[1] = 0.001 * (float) $depth;
+            @s::start_interpolation = 0;
+        }
+    }
+
+    function finish_construction() {
+        tag @s remove tf2.constructing;
+        tf2.health:@s < tf2.max_health:@s;
+        @s::transformation.translation[1] = 0.0f;
+        execute on vehicle run @s::transformation.translation[1] = 0.0f;
+        tf2.primary_ammo:@s[tag=tf2.sentry] = tf2.primary_maxAmmo:@s;
+        tf2.building.metal:@s[tag=tf2.dispenser] = DISPENSER_START_METAL;
+        tf2.building.ticks_idle:@s = 0;
+        playsound minecraft:block.beacon.activate block @a ~ ~ ~ 0.5 1.6;
+    }
+
+    function wrench_hit() {
+        // @s = friendly building, the Engineer swinging has tag iris.executing
+        // Mirrors CBaseObject::InputWrenchHit: under construction a hit speeds up the build,
+        // otherwise repair first, upgrade only when nothing needed repairing, then sentry ammo
+        // @within Weapons.damage_building()
+        if (entity @s[tag=tf2.constructing]) return run {
+            tf2.building.boost:@s = CONSTRUCTION_BOOST_TICKS;
+            particle minecraft:wax_on ~ ~0.5 ~ 0.3 0.3 0.3 0 4;
+            return 1;
+        }
+
+        $metal = tf2.metal:@e[type=#tf2:player_like, tag=iris.executing, limit=1];
+        $did_work = false;
+
+        $repair := tf2.max_health:@s - tf2.health:@s;
+        if ($repair > 0) {
+            $repair < WRENCH_REPAIR_PER_HIT;
+            $affordable := $metal * WRENCH_HP_PER_METAL;
+            $repair < $affordable;
+            $cost := ($repair + WRENCH_HP_PER_METAL - 1) / WRENCH_HP_PER_METAL;
+            tf2.health:@s += $repair;
+            $metal -= $cost;
+            if ($repair > 0) {
+                $did_work = true;
+                particle minecraft:happy_villager ~ ~0.6 ~ 0.3 0.3 0.3 0 6;
+            }
+        }
+
+        if (!$did_work && tf2.building.level:@s < 3 && $metal > 0) {
+            $add := UPGRADE_METAL - tf2.building.upgrade_metal:@s;
+            $add < UPGRADE_METAL_PER_HIT;
+            $add < $metal;
+            $metal -= $add;
+            tf2.building.upgrade_metal:@s += $add;
+            particle minecraft:wax_off ~ ~0.6 ~ 0.3 0.3 0.3 0 4;
+            if (tf2.building.upgrade_metal:@s >= UPGRADE_METAL) {
+                this.upgrade();
+            }
+        }
+
+        if (entity @s[tag=tf2.sentry]) {
+            $shells := tf2.primary_maxAmmo:@s - tf2.primary_ammo:@s;
+            $shells < SENTRY_SHELLS_PER_HIT;
+            $shells < $metal;
+            tf2.primary_ammo:@s += $shells;
+            $metal -= $shells;
+        }
+
+        tf2.metal:@e[type=#tf2:player_like, tag=iris.executing, limit=1] = $metal;
+        playsound minecraft:block.smithing_table.use block @a ~ ~ ~ 0.5 1.5;
+    }
+
+    function upgrade() {
+        // Level up: health refills to the new max and sentry shells refill (CBaseObject::StartUpgrading)
+        tf2.building.level:@s++;
+        tf2.building.upgrade_metal:@s = 0;
+        this.apply_level();
+        tf2.health:@s = tf2.max_health:@s;
+        tf2.primary_ammo:@s[tag=tf2.sentry] = tf2.primary_maxAmmo:@s;
+        playsound minecraft:block.beacon.power_select block @a ~ ~ ~ 0.7 1.2;
+        particle minecraft:totem_of_undying ~ ~0.6 ~ 0.3 0.4 0.3 0.2 20;
+    }
+
+    function destroyed() {
+        // @s = building whose health hit 0, or one being removed by its owner
+        particle minecraft:explosion ~ ~0.5 ~ 0.2 0.2 0.2 0 2;
+        playsound minecraft:entity.generic.explode block @a ~ ~ ~ 0.8 1.2;
+        building.sentry.get_owner();
+        execute if entity @s[tag=tf2.sentry]
+                run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Sentry Gun was destroyed!");
+        execute if entity @s[tag=tf2.dispenser]
+                run Text.tellraw(@a[tag=tf2.owner], "&<red>Your Dispenser was destroyed!");
+        tag @a remove tf2.owner;
+        execute on vehicle run kill @s;
+        kill @s;
+    }
+
+    function detonate_owned() {
+        // @s = Engineer. Removes all their buildings (Destruction PDA, class change)
+        this.tag_owned();
+        execute as @e[tag=tf2.owned] at @s run this.destroyed();
+        tag @e remove tf2.owned;
+    }
+
+    function detonate_type() {
+        // @s = Engineer, $type = building type. No metal refund, same as TF2.
+        this.tag_owned();
+        $found = false;
+        if ($type == 0) $found = execute if entity @e[tag=tf2.owned, tag=tf2.sentry];
+        if ($type == 1) $found = execute if entity @e[tag=tf2.owned, tag=tf2.dispenser];
+        if ($type == 0) execute as @e[tag=tf2.owned, tag=tf2.sentry] at @s run this.destroyed();
+        if ($type == 1) execute as @e[tag=tf2.owned, tag=tf2.dispenser] at @s run this.destroyed();
+        tag @e remove tf2.owned;
+        if ($type >= 2) {
+            return run Text.tellraw(@s, "&<yellow, italic>Teleporters aren't in yet.");
+        }
+        if (!$found) {
+            Text.tellraw(@s, "&<yellow, italic>You don't have one of those built.");
+        }
+    }
+
+    function status_hud() {
+        // @s = Engineer. Fills actionbar::buildings with a short status of each building they own
+        actionbar::buildings = [""];
+        this.tag_owned();
+        execute as @e[tag=tf2.owned, tag=tf2.sentry, limit=1] run {
+            vars::level = tf2.building.level:@s;
+            actionbar::buildings << {text: "  Sentry ", color: "gray"};
+            actionbar::buildings << {text: "L", color: "white"};
+            actionbar::buildings << vars::level[0:];
+            this.status_line();
+        }
+        execute as @e[tag=tf2.owned, tag=tf2.dispenser, limit=1] run {
+            vars::level = tf2.building.level:@s;
+            actionbar::buildings << {text: "  Dispenser ", color: "gray"};
+            actionbar::buildings << {text: "L", color: "white"};
+            actionbar::buildings << vars::level[0:];
+            this.status_line();
+        }
+        tag @e remove tf2.owned;
+    }
+    function status_line() {
+        // @s = building
+        if (entity @s[tag=tf2.constructing]) return run {
+            $total = EVAL(SENTRY_BUILD_TICKS * 10);
+            if (entity @s[tag=tf2.dispenser]) $total = EVAL(DISPENSER_BUILD_TICKS * 10);
+            $percent := tf2.building.progress:@s * 100 / $total;
+            vars::percent = $percent;
+            actionbar::buildings << {text: " building ", color: "yellow"};
+            actionbar::buildings << vars::percent[0:];
+            actionbar::buildings << {text: "%", color: "yellow"};
+            return 1;
+        }
+        vars::hp = tf2.health:@s;
+        actionbar::buildings << {text: " ❤", color: "red"};
+        actionbar::buildings << vars::hp[0:];
+        if (entity @s[tag=tf2.sentry]) {
+            vars::shells = tf2.primary_ammo:@s;
+            actionbar::buildings << {text: " ⁍", color: "gold"};
+            actionbar::buildings << vars::shells[0:];
+        }
+        if (tf2.building.level:@s < 3) {
+            vars::upgrade = tf2.building.upgrade_metal:@s;
+            actionbar::buildings << {text: " ⬆", color: "aqua"};
+            actionbar::buildings << vars::upgrade[0:];
+            actionbar::buildings << {text: "/200", color: "aqua"};
+        }
+    }
+}

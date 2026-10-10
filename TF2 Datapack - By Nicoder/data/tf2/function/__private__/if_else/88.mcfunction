@@ -1,3 +1,2 @@
-data modify storage tf2:lookup damages append value {instakill:true,cause:-2147483648,kill_verb:"fell into the void"}
-execute store result storage tf2:lookup damages[-1].target int 1 run scoreboard players get @s tf2.player.id
-tp @s ~ 5 ~
+scoreboard players operation $mot.collision_surface_z tf2.var = $mot.geo_min_z tf2.var
+scoreboard players set __if_else__ tf2.var 1

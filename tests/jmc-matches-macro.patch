@@ -1,0 +1,17 @@
+diff --git a/src/jmc/compile/lexer_func_content.py b/src/jmc/compile/lexer_func_content.py
+index d358f9a..45ef1c3 100644
+--- a/src/jmc/compile/lexer_func_content.py
++++ b/src/jmc/compile/lexer_func_content.py
+@@ -820,6 +820,12 @@ class FuncContent:
+         token_3 = _get_token(key_pos + 3)
+         token_4 = _get_token(key_pos + 4)
+ 
++        # $(macro_arg)
++        if token_1.string == "$" and token_2 is not None and token_2.string.startswith("("):
++            append_commands(self.__commands, "matches")
++            append_commands(self.__commands, "$" + token_2.string)
++            self._skip_token_count = 2
++            return
+         # A..B
+         if token_1.string != "-" and (token_2 is None or token_2.string != "-"):
+             token = token_1

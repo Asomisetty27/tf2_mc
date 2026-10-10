@@ -667,7 +667,12 @@ class Weapons {
                 return run this.damage_building();
 
         // @within this.damage()
-        if (score @s tf2.team = $current tf2.team) return 0;
+        // Engineer's melee on a friendly building = wrench hit (repair / upgrade / ammo / build speed)
+        if (score @s tf2.team = $current tf2.team) return run {
+            execute if entity @a[tag=iris.executing, limit=1, scores={tf2.class=Class.ENGINEER}, predicate=tf2:holding_melee]
+                    run building.wrench_hit();
+            return 0;
+        }
         vars::kill_verb = "destroyed";
 
         $cause = tf2.player.id:@a[tag=iris.executing, limit=1];

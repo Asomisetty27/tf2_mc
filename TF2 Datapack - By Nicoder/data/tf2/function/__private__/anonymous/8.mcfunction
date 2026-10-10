@@ -1,3 +1,2 @@
-scoreboard players operation @s tf2.primary_clip = $_clip_ tf2.var
-scoreboard players operation @s tf2.primary_maxClip = $_maxClip_ tf2.var
-scoreboard players operation @s tf2.primary_ammo = $_ammo_ tf2.var
+scoreboard players operation $level tf2.var = @s tf2.building.level
+execute on vehicle store result entity @s item.components.minecraft:custom_model_data.floats[0] int 1 run scoreboard players get $level tf2.var

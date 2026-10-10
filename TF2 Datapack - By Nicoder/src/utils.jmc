@@ -1,6 +1,11 @@
 function setup_markers() {
     // Summons new gamestate markers if there aren't enough, and kills extras if there are too many.
 
+    // Spawn chunks aren't kept loaded anymore. If 0 0 0 isn't fully loaded, markers summoned there
+    // don't show up in @e yet, the count never rises, and this recursed until the command limit
+    // (~5800 markers per /reload). Wait for the chunk; __tick__ retries every second.
+    execute unless loaded 0 0 0 run return fail;
+
     if ($batch_markers < $Settings.max_batches) {
         summon minecraft:marker 0 0 0 {Tags:["tf2.batch"], data:{lastPos: [0.0d, 0.0d, 0.0d], map: {}}};
     }
@@ -67,6 +72,10 @@ function class_select() {
     if (vars::class_name) {
         give.internal() with vars::;
     }
+    // switching off Engineer blows up their buildings, like TF2
+    if (tf2.class:@s != Class.ENGINEER) {
+        building.detonate_owned();
+    }
     item replace entity @s hotbar.8 with paper[item_model='tf2:misc/choose_class',custom_name='Change Class'];
 
     replenish_ammo_and_health();
@@ -98,9 +107,9 @@ function replenish_ammo_and_health() {
         // drop Über on death
         Class.Medic.drop_uber_on_death();
     }
-    // if (tf2.class:@s == Class.ENGINEER) {
-    //     tf2.metal:@s = 200;
-    // }
+    if (tf2.class:@s == Class.ENGINEER) {
+        tf2.metal:@s = ENGINEER_MAX_METAL;
+    }
 }
 
 function swap_hands() {

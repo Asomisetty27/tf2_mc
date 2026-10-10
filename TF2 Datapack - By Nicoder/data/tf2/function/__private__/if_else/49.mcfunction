@@ -1,4 +1,4 @@
-scoreboard players operation $mot.distance_head_x tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_head_x tf2.var 1000
-scoreboard players operation $mot.distance_tail_x tf2.var *= -1 tf2.const
-scoreboard players add $mot.distance_tail_x tf2.var 1000
+scoreboard players operation $surface_x tf2.var = @s tf2.collision_x
+scoreboard players set $surface_y tf2.var 0
+scoreboard players set $surface_z tf2.var 0
+function tf2:projectile/roll

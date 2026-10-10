@@ -1,2 +1,5 @@
-$data modify storage tf2:running_games $(i).spawn_time.red[0] set from storage tf2:running_games $(i).spawn_time.red[$(red)]
-$data modify storage tf2:running_games $(i).spawn_time.blu[0] set from storage tf2:running_games $(i).spawn_time.blu[$(blu)]
+scoreboard players set @s tf2.map 5
+scoreboard players operation @s tf2.batch_number > @e[type=marker,tag=tf2.batch] tf2.batch_number
+scoreboard players add @s tf2.batch_number 1
+execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
+function tf2:session/sync with storage tf2:index

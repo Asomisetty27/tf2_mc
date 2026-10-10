@@ -1,2 +1,3 @@
-execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
-function tf2:__private__/anonymous/34 with storage tf2:index
+execute if score @s tf2.team = $winner tf2.var run return run tellraw @s {"text":"Victory.","bold":false,"italic":true,"type":"text"}
+execute if score $winner tf2.var matches 1..2 run tellraw @s {"text":"You've failed!","bold":false,"italic":true,"type":"text"}
+tag @s add tf2.humiliation

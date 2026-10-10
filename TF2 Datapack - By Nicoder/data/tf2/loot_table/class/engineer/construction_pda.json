@@ -22,7 +22,7 @@
                         {
                             "function": "minecraft:set_name",
                             "name": {
-                                "text": "Construction PDA (doesn't work yet)",
+                                "text": "Construction PDA",
                                 "color": "gray",
                                 "italic": true
                             }

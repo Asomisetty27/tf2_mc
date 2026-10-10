@@ -1,4 +1,3 @@
-$execute if score $z tf2.var matches 0 if score $x tf2.var > $y tf2.var run data modify storage tf2:vars param set value '~1 ~$(fraction) ~'
-$execute if score $z tf2.var matches 0 if score $x tf2.var <= $y tf2.var run data modify storage tf2:vars param set value '~$(fraction) ~1 ~'
-$execute if score $x tf2.var matches 0 if score $z tf2.var > $y tf2.var run data modify storage tf2:vars param set value '~ ~$(fraction) ~1'
-$execute if score $x tf2.var matches 0 if score $z tf2.var <= $y tf2.var run data modify storage tf2:vars param set value '~ ~1 ~$(fraction)'
+execute if entity @s[tag=!tf2.has_hit_wall,tag=!tf2.sticky] run return run function tf2:grenade/explode
+execute if entity @s[tag=!tf2.has_hit_object] run function tf2:__private__/anonymous/41
+tag @s add tf2.has_hit_object

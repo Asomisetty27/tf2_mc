@@ -1,8 +1,6 @@
-function tf2:building/sentry/get_owner
-tag @p[tag=tf2.owner] add tf2.cause
-tag @p[tag=tf2.owner] remove tf2.owner
-execute store result storage tf2:vars level int 1 run scoreboard players get @s tf2.building.level
-data modify storage tf2:lookup damages[-1].weapon set value []
-data modify storage tf2:lookup damages[-1].weapon append value {text:"Level ",italic:true,color:"gray"}
-data modify storage tf2:lookup damages[-1].weapon append string storage tf2:vars level 0
-data modify storage tf2:lookup damages[-1].weapon append value ' Sentry Gun'
+function tf2:__private__/anonymous/32 with storage tf2:summon pickups[-1]
+execute store result score @s tf2.size run data get storage tf2:summon pickups[-1].size
+scoreboard players operation @s tf2.batch_number = $local tf2.batch_number
+scoreboard players set @s tf2.respawn_timer 1
+tag @s remove tf2.new
+function tf2:session/sync with storage tf2:index

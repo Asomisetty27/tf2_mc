@@ -1,3 +1,3 @@
 scoreboard players set __if_else__ tf2.var 0
-execute if score $_rangeDependent_ tf2.var matches 1.. run function tf2:__private__/if_else/22
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/24
+execute if score $_rangeDependent_ tf2.var matches 1.. run function tf2:__private__/if_else/34
+execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/36

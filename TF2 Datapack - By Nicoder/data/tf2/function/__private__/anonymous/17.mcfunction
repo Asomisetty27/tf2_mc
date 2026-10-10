@@ -1,4 +1,3 @@
-function tf2:session/increment_global with storage tf2:index
-function tf2:session/sync with storage tf2:index
-$data modify entity @s data.map set from storage tf2:maps $(map_id)
-$data modify storage tf2:running_games $(i) set from storage tf2:maps $(map_id)
+scoreboard players operation $_clip_ tf2.var = @s tf2.primary_clip
+scoreboard players operation $_maxClip_ tf2.var = @s tf2.primary_maxClip
+scoreboard players operation $_ammo_ tf2.var = @s tf2.primary_ammo

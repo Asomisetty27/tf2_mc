@@ -22,7 +22,7 @@
                         {
                             "function": "minecraft:set_name",
                             "name": {
-                                "text": "Destruction PDA (doesn't work yet)",
+                                "text": "Destruction PDA",
                                 "color": "gray",
                                 "italic": true
                             }

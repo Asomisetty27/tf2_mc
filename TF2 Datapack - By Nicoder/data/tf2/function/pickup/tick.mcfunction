@@ -5,6 +5,7 @@ execute positioned ~ ~-500.5 ~ run ride @s[scores={tf2.respawn_timer=0}] mount @
 execute if entity @s[tag=tf2.health_pack] as @a if score @s tf2.health = @s tf2.max_health run tag @s add tf2.ineligible
 execute if entity @s[tag=tf2.ammo_pack] as @a if score @s tf2.primary_ammo = @s tf2.primary_maxAmmo if score @s tf2.primary_clip = @s tf2.primary_maxClip if score @s tf2.secondary_ammo = @s tf2.secondary_maxAmmo if score @s tf2.secondary_clip = @s tf2.secondary_maxClip run tag @s add tf2.ineligible
 tag @a[scores={tf2.class=1,tf2.cloak=..599}] remove tf2.ineligible
+execute if entity @s[tag=tf2.ammo_pack] run tag @a[scores={tf2.class=8,tf2.metal=..199}] remove tf2.ineligible
 tag @a[gamemode=spectator] add tf2.ineligible
 tag @a[distance=..1.25,limit=1,sort=nearest,tag=!tf2.ineligible] add tf2.recipient
 tag @a remove tf2.ineligible

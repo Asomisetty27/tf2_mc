@@ -1,2 +1,2 @@
-scoreboard players operation $num tf2.var = $horizontal tf2.var
-scoreboard players operation $denom tf2.var = $y tf2.var
+execute as @e[type=item,tag=!tf2.static_prop,tag=!tf2.pickup,distance=..2] run function tf2:__private__/anonymous/47
+execute as @e[type=snowball,distance=..5] run function tf2:__private__/anonymous/48

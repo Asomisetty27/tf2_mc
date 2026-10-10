@@ -1,5 +1,3 @@
-execute if entity @s[tag=tf2.uber_patient] run return fail
-tag @s add tf2.uber_patient
-item replace entity @s armor.head with air
-item replace entity @s armor.chest with air
-item replace entity @s armor.legs with air
+execute store result storage tf2:summon dispenser.team int 1 run scoreboard players get @s tf2.team
+data modify storage tf2:summon dispenser.level set value 1
+function tf2:building/dispenser/spawn

@@ -1,4 +1,4 @@
-scoreboard players remove $i tf2.door.id 1
-execute summon item_display run function tf2:door/initialize_path
+execute summon marker run function tf2:__private__/anonymous/30 with storage tf2:index
 data remove storage tf2:summon doors[-1]
-execute if score $i tf2.door.id matches 1.. run function tf2:__private__/while_loop/2
+scoreboard players add $i tf2.var 1
+execute if data storage tf2:summon doors[] run function tf2:__private__/while_loop/2
