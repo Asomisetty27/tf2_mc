@@ -1,3 +1,4 @@
-execute if score @s tf2.team = $winner tf2.var run return run tellraw @s {"text":"Victory.","bold":false,"italic":true,"type":"text"}
-execute if score $winner tf2.var matches 1..2 run tellraw @s {"text":"You've failed!","bold":false,"italic":true,"type":"text"}
-tag @s add tf2.humiliation
+data modify entity @s Pos set from storage tf2:summon pickups[-1].Pos
+scoreboard players operation @s tf2.batch_number = $local tf2.batch_number
+tag @s remove tf2.new
+function tf2:session/sync with storage tf2:index

@@ -151,6 +151,9 @@ class Player {
             if (predicate tf2:ammo_in_clip) {
                 Weapons.main_fire();
             }
+            else if (items entity @s weapon.mainhand *[custom_data~{attributes:{sapper:true}}]) {
+                Weapons.main_fire();
+            }
         }
         else if (data entity @s[scores={tf2.interpolate_rmb=1..}] SelectedItem.components.minecraft:custom_data.attributes.interpolate_rmb) {
             Weapons.interpolate_rmb();

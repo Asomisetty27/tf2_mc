@@ -1,3 +1,4 @@
-execute as @e[type=!#tf2:player_like] run function tf2:session/check_validity
-execute store result score $batch_markers tf2.var if entity @e[type=marker,tag=tf2.batch]
-execute unless score $batch_markers tf2.var = $Settings.max_batches tf2.var run function tf2:setup_markers
+scoreboard players set $surface_x tf2.var 0
+scoreboard players set $surface_y tf2.var 0
+scoreboard players operation $surface_z tf2.var = @s tf2.collision_z
+function tf2:grenade/roll

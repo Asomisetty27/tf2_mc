@@ -1,4 +1,5 @@
-scoreboard players enable @s tf2.new_class
-dialog show @s[scores={tf2.team=1}] tf2:red_class_menu
-dialog show @s[scores={tf2.team=2}] tf2:blu_class_menu
-tag @s add tf2.in_class_menu
+kill @e[type=arrow,tag=!tf2.projectile]
+scoreboard players set __if_else__ tf2.var 0
+execute if predicate tf2:ammo_in_clip run function tf2:__private__/if_else/117
+execute if score __if_else__ tf2.var matches 0 if items entity @s weapon.mainhand *[custom_data~{attributes:{sapper:true}}] run function tf2:weapons/main_fire
+scoreboard players set __if_else__ tf2.var 1

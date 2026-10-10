@@ -1,4 +1,2 @@
-data modify storage tf2:summon line.X set from entity @s Pos[0]
-data modify storage tf2:summon line.Y set from entity @s Pos[1]
-data modify storage tf2:summon line.Z set from entity @s Pos[2]
-kill @s
+execute if entity @s[scores={tf2.team=1}] run function tf2:__private__/if_else/37
+execute if entity @s[scores={tf2.team=2}] run function tf2:__private__/if_else/38

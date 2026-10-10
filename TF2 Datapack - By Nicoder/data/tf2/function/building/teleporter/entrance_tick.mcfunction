@@ -4,6 +4,7 @@ scoreboard players set $ready tf2.var 1
 execute unless entity @e[tag=tf2.tele_match,tag=!tf2.constructing] run scoreboard players set $ready tf2.var 0
 execute if entity @s[tag=tf2.sapped] run scoreboard players set $ready tf2.var 0
 execute if entity @e[tag=tf2.tele_match,tag=tf2.sapped] run scoreboard players set $ready tf2.var 0
+execute if entity @e[tag=tf2.tele_match,scores={tf2.building.disable_ticks=1..}] run scoreboard players set $ready tf2.var 0
 execute if score @s tf2.attack_delay matches 1.. run scoreboard players set $ready tf2.var 0
 execute if score @s tf2.building.tele_timer matches 1.. run scoreboard players set $ready tf2.var 0
 execute unless score $ready tf2.var matches 1.. run return run tag @s remove tf2.tele_ready

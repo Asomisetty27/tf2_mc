@@ -1,4 +1,2 @@
-execute store result score $Xf tf2.var run data get entity @s Pos[0] 100
-execute store result score $Yf tf2.var run data get entity @s Pos[1] 100
-execute store result score $Zf tf2.var run data get entity @s Pos[2] 100
-kill
+execute if entity @a[tag=iris.executing,limit=1,scores={tf2.class=8},predicate=tf2:holding_melee] run function tf2:building/wrench_hit
+return 0

@@ -59,6 +59,7 @@
 #define WRENCH_REPAIR_PER_HIT 102
 #define WRENCH_HP_PER_METAL 3
 #define SENTRY_SHELLS_PER_HIT 40
+#define WRENCH_DMG_VS_SAPPER 65
 // build times in ticks: 10.5 s and 21 s
 #define SENTRY_BUILD_TICKS 210
 #define DISPENSER_BUILD_TICKS 420

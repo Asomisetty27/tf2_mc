@@ -4,13 +4,19 @@
             "rolls": 1,
             "entries": [
                 {
-                    "type": "minecraft:item",
-                    "name": "minecraft:white_dye",
+                    "type": "minecraft:loot_table",
+                    "value": "tf2:crossbow_base",
                     "functions": [
                         {
                             "function": "minecraft:set_components",
                             "components": {
-                                "minecraft:item_model": "tf2:weapon/spy/secondary/sapper"
+                                "minecraft:item_model": "tf2:weapon/spy/secondary/sapper",
+                                "minecraft:unbreakable": {},
+                                "minecraft:tooltip_display": {
+                                    "hidden_components": [
+                                        "minecraft:unbreakable"
+                                    ]
+                                }
                             }
                         },
                         {
@@ -23,7 +29,7 @@
                         },
                         {
                             "function": "minecraft:set_custom_data",
-                            "tag": "{key:11}"
+                            "tag": "{raycast:{HorizontalCount:1,VerticalCount:1,CenteredCount:0,EndpointEntity:false,TargetEntities:true,SpreadFactor:[0,0],MaxRecursionDepth:500},attributes:{damage:{base:0},sapper:true},controls:{reload:0,main_fire:true,alt_fire:false},key:11}"
                         }
                     ]
                 }

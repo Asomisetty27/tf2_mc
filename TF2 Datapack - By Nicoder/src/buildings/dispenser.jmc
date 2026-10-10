@@ -57,11 +57,11 @@ class building.dispenser {
         if (tf2.health:@s <= 0) {
             return run this.die();
         }
+        if (building.sapper.disabled()) {
+            return 0;
+        }
         if (entity @s[tag=tf2.constructing]) {
             return run building.construction_tick();
-        }
-        if (entity @s[tag=tf2.sapped]) {
-            return fail;
         }
 
         this.refill_storage();

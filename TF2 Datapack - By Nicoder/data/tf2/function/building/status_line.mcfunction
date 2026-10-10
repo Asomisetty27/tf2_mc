@@ -1,3 +1,4 @@
+execute if entity @s[tag=tf2.sapped] run return run data modify storage tf2:actionbar buildings append value {text:" SAPPED",color:"red",bold:true}
 execute if entity @s[tag=tf2.constructing] run return run function tf2:__private__/anonymous/21
 execute store result storage tf2:vars hp int 1 run scoreboard players get @s tf2.health
 data modify storage tf2:actionbar buildings append value {text:" ❤",color:"red"}

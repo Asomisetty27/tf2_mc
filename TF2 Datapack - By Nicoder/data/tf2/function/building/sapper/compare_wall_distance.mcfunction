@@ -1,0 +1,1 @@
+$execute as @e[type=#tf2:player_like,tag=tf2.sapping,limit=1] at @s anchored eyes positioned ^ ^ ^ unless entity @e[tag=tf2.sap_checking,distance=..$(Distance)] run scoreboard players set $blocked tf2.var 1

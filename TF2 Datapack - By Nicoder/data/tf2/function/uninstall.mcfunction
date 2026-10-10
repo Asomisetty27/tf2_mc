@@ -138,6 +138,9 @@ scoreboard objectives remove tf2.building.upgrade_metal
 scoreboard objectives remove tf2.building.metal
 scoreboard objectives remove tf2.building.tele_timer
 scoreboard objectives remove tf2.building.tele_player
+scoreboard objectives remove tf2.building.sapper_hp
+scoreboard objectives remove tf2.building.sapper_owner
+scoreboard objectives remove tf2.building.disable_ticks
 scoreboard objectives remove tf2.health
 scoreboard objectives remove tf2.queue_type
 scoreboard objectives remove tf2.disguise

@@ -1,1 +1,2 @@
-$data modify storage tf2:lookup events set from storage tf2:running_games $(i).objectives[$(j)].data.$(team)_events
+$tag @s add tf2.$(kind)_pack
+$data modify entity @s Item.components.minecraft:item_model set value 'tf2:pickup/$(kind)'

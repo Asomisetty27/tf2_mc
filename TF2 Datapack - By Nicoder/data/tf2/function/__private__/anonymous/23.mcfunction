@@ -1,2 +1,2 @@
-execute if entity @s[scores={tf2.team=1}] run function tf2:__private__/if_else/36
-execute if entity @s[scores={tf2.team=2}] run function tf2:__private__/if_else/37
+function tf2:building/sapper/drain
+return 1

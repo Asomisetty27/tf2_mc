@@ -1,4 +1,2 @@
-scoreboard players operation @s tf2.mot_x *= -300 tf2.const
-scoreboard players operation @s tf2.mot_x /= 1000 tf2.const
-scoreboard players operation @s tf2.mot_z *= -300 tf2.const
-scoreboard players operation @s tf2.mot_z /= 1000 tf2.const
+$data modify storage tf2:running_games $(i).spawn_point.red[0] set from storage tf2:running_games $(i).spawn_point.red[$(red)]
+$data modify storage tf2:running_games $(i).spawn_point.blu[0] set from storage tf2:running_games $(i).spawn_point.blu[$(blu)]

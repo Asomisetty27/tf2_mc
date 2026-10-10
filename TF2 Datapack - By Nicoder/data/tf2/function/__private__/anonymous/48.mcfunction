@@ -1,3 +1,1 @@
-scoreboard players set @s tf2.mot_x 0
-scoreboard players set @s tf2.mot_y 0
-scoreboard players set @s tf2.mot_z 0
+$data modify storage tf2:lookup events set from storage tf2:running_games $(i).objectives[$(j)].data.$(team)_events

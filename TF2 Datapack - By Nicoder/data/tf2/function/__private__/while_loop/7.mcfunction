@@ -13,22 +13,22 @@ execute store result score $mot.geo_max_z tf2.var run data get storage tf2:motio
 scoreboard players operation $mot.geo_max_z tf2.var += $mot.voxel_z tf2.var
 execute store success score $mot.is_entity tf2.var run data get storage tf2:motion geo{type:"ENTITY"}
 scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_x tf2.var matches 1 run function tf2:__private__/if_else/83
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/84
+execute if score $mot.sign_x tf2.var matches 1 run function tf2:__private__/if_else/84
+execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/85
 scoreboard players operation $mot.distance_x tf2.var *= $mot.distance tf2.var
 scoreboard players operation $mot.distance_x tf2.var /= $mot.motion_x tf2.var
-execute unless score $mot.motion_x tf2.var matches 0 if score $mot.distance_x tf2.var matches 0.. if score $mot.distance_x tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/88
+execute unless score $mot.motion_x tf2.var matches 0 if score $mot.distance_x tf2.var matches 0.. if score $mot.distance_x tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/89
 scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_y tf2.var matches 1 run function tf2:__private__/if_else/89
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/90
+execute if score $mot.sign_y tf2.var matches 1 run function tf2:__private__/if_else/90
+execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/91
 scoreboard players operation $mot.distance_y tf2.var *= $mot.distance tf2.var
 scoreboard players operation $mot.distance_y tf2.var /= $mot.motion_y tf2.var
-execute unless score $mot.motion_y tf2.var matches 0 if score $mot.distance_y tf2.var matches 0.. if score $mot.distance_y tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/94
+execute unless score $mot.motion_y tf2.var matches 0 if score $mot.distance_y tf2.var matches 0.. if score $mot.distance_y tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/95
 scoreboard players set __if_else__ tf2.var 0
-execute if score $mot.sign_z tf2.var matches 1 run function tf2:__private__/if_else/95
-execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/96
+execute if score $mot.sign_z tf2.var matches 1 run function tf2:__private__/if_else/96
+execute if score __if_else__ tf2.var matches 0 run function tf2:__private__/if_else/97
 scoreboard players operation $mot.distance_z tf2.var *= $mot.distance tf2.var
 scoreboard players operation $mot.distance_z tf2.var /= $mot.motion_z tf2.var
-execute unless score $mot.motion_z tf2.var matches 0 if score $mot.distance_z tf2.var matches 0.. if score $mot.distance_z tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/100
+execute unless score $mot.motion_z tf2.var matches 0 if score $mot.distance_z tf2.var matches 0.. if score $mot.distance_z tf2.var <= $mot.distance tf2.var run function tf2:__private__/if_else/101
 data remove storage iris:data Shape[-1]
 execute if data storage iris:data Shape[] run function tf2:__private__/while_loop/7

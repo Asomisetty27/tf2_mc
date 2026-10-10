@@ -305,6 +305,9 @@ class Weapons {
         if (items entity @s weapon.mainhand *[custom_data~{attributes:{heal:{}}}]) {
             return run Class.Medic.select_heal_target();
         }
+        if (items entity @s weapon.mainhand *[custom_data~{attributes:{sapper:true}}]) {
+            return run building.sapper.place();
+        }
         if (!predicate tf2:has_main_fire) return 0;
         this.get_ammo();
         if ($_clip_ <= 0 && !predicate tf2:holding_melee) return 0;

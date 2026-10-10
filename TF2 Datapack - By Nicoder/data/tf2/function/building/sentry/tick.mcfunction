@@ -1,5 +1,6 @@
 tag @s remove tf2.new
 execute if score @s tf2.health matches ..0 run return run function tf2:building/sentry/die
+execute if function tf2:building/sapper/disabled run return 0
 execute if entity @s[tag=tf2.constructing] run return run function tf2:building/construction_tick
 scoreboard players set __if_else__ tf2.var 0
 execute unless score @s tf2.building.target = @s tf2.building.target run function tf2:__private__/if_else/11

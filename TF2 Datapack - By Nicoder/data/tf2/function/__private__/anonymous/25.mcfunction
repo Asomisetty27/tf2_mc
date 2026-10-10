@@ -1,3 +1,3 @@
-scoreboard players operation $_clip_ tf2.var = @s tf2.primary_clip
-scoreboard players operation $_maxClip_ tf2.var = @s tf2.primary_maxClip
-scoreboard players operation $_ammo_ tf2.var = @s tf2.primary_ammo
+function tf2:building/teleporter/tag_match
+execute as @e[tag=tf2.tele_match,tag=tf2.sapped] at @s run function tf2:building/sapper/damage_sapper
+tag @e remove tf2.tele_match

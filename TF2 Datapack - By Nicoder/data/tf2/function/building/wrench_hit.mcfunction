@@ -1,3 +1,4 @@
+execute if entity @s[tag=tf2.sapped] run return run function tf2:building/sapper/wrench_hit
 execute if entity @s[tag=tf2.constructing] run return run function tf2:__private__/anonymous/14
 scoreboard players operation $metal tf2.var = @e[type=#tf2:player_like,tag=iris.executing,limit=1] tf2.metal
 scoreboard players set $did_work tf2.var 0

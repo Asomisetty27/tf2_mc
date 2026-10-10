@@ -63,7 +63,8 @@ make_weapon(
 JMC.python(`
 make_weapon(
     Class.SPY, slot=1, name='Sapper',
-    base_item='minecraft:white_dye'
+    attributes={'damage': {'base': 0}, 'sapper': True},
+    controls={'reload': 0}
 )
 `, jmc=true);
 

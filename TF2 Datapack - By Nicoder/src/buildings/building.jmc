@@ -214,6 +214,9 @@ class building {
         // Mirrors CBaseObject::InputWrenchHit: under construction a hit speeds up the build,
         // otherwise repair first, upgrade only when nothing needed repairing, then sentry ammo
         // @within Weapons.damage_building()
+        if (entity @s[tag=tf2.sapped]) {
+            return run building.sapper.wrench_hit();
+        }
         if (entity @s[tag=tf2.constructing]) return run {
             tf2.building.boost:@s = CONSTRUCTION_BOOST_TICKS;
             particle minecraft:wax_on ~ ~0.5 ~ 0.3 0.3 0.3 0 4;
@@ -374,6 +377,9 @@ class building {
     }
     function status_line() {
         // @s = building
+        if (entity @s[tag=tf2.sapped]) {
+            return run actionbar::buildings << {text: " SAPPED", color: "red", bold: true};
+        }
         if (entity @s[tag=tf2.constructing]) return run {
             $total = EVAL(SENTRY_BUILD_TICKS * 10);
             if (entity @s[tag=tf2.dispenser]) $total = EVAL(DISPENSER_BUILD_TICKS * 10);

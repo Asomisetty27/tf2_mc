@@ -1,2 +1,3 @@
-execute store result storage tf2:index i int 1 run scoreboard players get @s tf2.batch_number
-function tf2:__private__/anonymous/53 with storage tf2:index
+execute if entity @s[tag=!tf2.has_hit_wall,tag=!tf2.sticky] run return run function tf2:grenade/explode
+execute if entity @s[tag=!tf2.has_hit_object] run function tf2:__private__/anonymous/53
+tag @s add tf2.has_hit_object

@@ -1,3 +1,2 @@
-execute if entity @s[tag=!tf2.has_hit_wall,tag=!tf2.sticky] run return run function tf2:grenade/explode
-execute if entity @s[tag=!tf2.has_hit_object] run function tf2:__private__/anonymous/49
-tag @s add tf2.has_hit_object
+$data modify storage tf2:running_games $(i).spawn_time.red[0] set from storage tf2:running_games $(i).spawn_time.red[$(red)]
+$data modify storage tf2:running_games $(i).spawn_time.blu[0] set from storage tf2:running_games $(i).spawn_time.blu[$(blu)]

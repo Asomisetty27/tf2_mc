@@ -1,2 +1,6 @@
-$data modify storage tf2:running_games $(i).spawn_point.red[0] set from storage tf2:running_games $(i).spawn_point.red[$(red)]
-$data modify storage tf2:running_games $(i).spawn_point.blu[0] set from storage tf2:running_games $(i).spawn_point.blu[$(blu)]
+function tf2:__private__/anonymous/44 with storage tf2:summon pickups[-1]
+execute store result score @s tf2.size run data get storage tf2:summon pickups[-1].size
+scoreboard players operation @s tf2.batch_number = $local tf2.batch_number
+scoreboard players set @s tf2.respawn_timer 1
+tag @s remove tf2.new
+function tf2:session/sync with storage tf2:index

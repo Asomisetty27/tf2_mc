@@ -7,7 +7,7 @@ execute if score $instakill tf2.var matches 1.. run scoreboard players operation
 scoreboard players operation @s tf2.health -= $amount tf2.var
 damage @s 0.01 tf2:screenshake by @n[tag=tf2.cause]
 execute unless entity @e[tag=tf2.cause] run damage @s 0.01 tf2:screenshake
-execute as @n[tag=tf2.cause,predicate=tf2:is_a_building] run function tf2:__private__/anonymous/52
+execute as @n[tag=tf2.cause,predicate=tf2:is_a_building] run function tf2:__private__/anonymous/56
 scoreboard players set @s tf2.ticks_since_hurt 0
 execute if score @s tf2.health < @s tf2.max_health run tag @s remove tf2.overheal
 data modify storage tf2:lookup damages[-1].X set from entity @s Pos[0]

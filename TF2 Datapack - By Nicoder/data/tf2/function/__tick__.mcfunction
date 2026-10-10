@@ -33,7 +33,7 @@ execute store result score $flicker tf2.var run scoreboard players operation $tr
 scoreboard players operation $flicker tf2.var %= 20 tf2.const
 scoreboard players operation $trigger_reminder tf2.var %= 2400 tf2.const
 execute if score $trigger_reminder tf2.var matches 0 run tellraw @a ["",{"text":"Remember, you can type ","color":"gray","type":"text"},{"text":"/trigger controls ","color":"white","bold":true,"type":"text"},{"text":"in chat to see the controls.","color":"gray","type":"text"}]
-execute if score $flicker tf2.var matches 0 run function tf2:__private__/if_else/109
+execute if score $flicker tf2.var matches 0 run function tf2:__private__/if_else/110
 execute if data storage tf2:lookup damages[] run function tf2:__private__/while_loop/8
 tag @e remove iris.executing
 function tf2:grenade/tick_all

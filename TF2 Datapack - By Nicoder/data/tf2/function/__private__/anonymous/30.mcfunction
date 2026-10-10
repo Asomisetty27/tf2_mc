@@ -1,1 +1,3 @@
-$execute store result storage tf2:lookup item.components.minecraft:custom_data.projectile.speed double 0.001 run data get storage tf2:lookup item.components.minecraft:custom_data.projectile.speed $(magnitude)
+scoreboard players operation @s tf2.primary_clip = $_clip_ tf2.var
+scoreboard players operation @s tf2.primary_maxClip = $_maxClip_ tf2.var
+scoreboard players operation @s tf2.primary_ammo = $_ammo_ tf2.var

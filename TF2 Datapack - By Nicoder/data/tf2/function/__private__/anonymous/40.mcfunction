@@ -1,2 +1,4 @@
-$tag @s add tf2.$(kind)_pack
-$data modify entity @s Item.components.minecraft:item_model set value 'tf2:pickup/$(kind)'
+function tf2:session/increment_global with storage tf2:index
+function tf2:session/sync with storage tf2:index
+$data modify entity @s data.map set from storage tf2:maps $(map_id)
+$data modify storage tf2:running_games $(i) set from storage tf2:maps $(map_id)

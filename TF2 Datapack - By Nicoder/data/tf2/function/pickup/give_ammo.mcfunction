@@ -25,7 +25,7 @@ scoreboard players operation @s tf2.secondary_clip += $clip_space tf2.var
 scoreboard players operation $add_amount tf2.var -= $clip_space tf2.var
 scoreboard players operation @s tf2.secondary_ammo += $add_amount tf2.var
 scoreboard players operation @s tf2.secondary_ammo < @s tf2.secondary_maxAmmo
-execute if score @s tf2.class matches 8 run function tf2:__private__/if_else/125
+execute if score @s tf2.class matches 8 run function tf2:__private__/if_else/127
 execute unless score @s tf2.class matches 1 run return 1
 execute store result score $full_cloak tf2.var run data get entity @s equipment.offhand.components.minecraft:custom_data.attributes.cloak_recharge 20
 scoreboard players operation $add_amount tf2.var = $percent tf2.var

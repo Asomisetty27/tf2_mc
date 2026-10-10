@@ -1,7 +1,7 @@
 tag @s remove tf2.new
 execute if score @s tf2.health matches ..0 run return run function tf2:building/dispenser/die
+execute if function tf2:building/sapper/disabled run return 0
 execute if entity @s[tag=tf2.constructing] run return run function tf2:building/construction_tick
-execute if entity @s[tag=tf2.sapped] run return fail
 function tf2:building/dispenser/refill_storage
 scoreboard players remove @s[scores={tf2.attack_delay=1..}] tf2.attack_delay 1
 scoreboard players operation $temp tf2.team = @s tf2.team

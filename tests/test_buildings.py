@@ -446,6 +446,101 @@ def test_teleporters(g):
     check("with level 2 health", g.score(exit_, "tf2.health"), 180)
 
 
+def test_sapper(g):
+    print("Sapper: placing, disabling, draining, wrench removal, teleporter pairs")
+    g.reset()
+    eng = g.villager("t.eng", 0.5, 0.5, pid=9001, metal=200)
+    g.build(eng, 0)
+    sentry = "@e[type=item_display,tag=tf2.sentry,limit=1]"
+    g.r(f"scoreboard players set {sentry} tf2.building.progress 99999")
+    g.ticks(1)
+    g.r(f"tp {eng} 0.5 {Y} -3")
+
+    def sap(spy):
+        g.r(f"execute as {spy} at @s run function tf2:building/sapper/place")
+
+    friendly = g.villager("t.friend", 0.5, 4.5, yaw=180, cls=SPY, team=1, pid=9030)
+    sap(friendly)
+    check("can't sap your own team's building", g.count("@e[tag=tf2.sentry,tag=tf2.sapped]"), 0)
+    g.r("kill @e[tag=t.friend]")
+
+    spy = g.villager("t.spy", 0.5, 6.5, yaw=180, cls=SPY, team=2, pid=9031)
+    sap(spy)
+    check("can't sap from 4+ blocks away (160 HU)", g.count("@e[tag=tf2.sentry,tag=tf2.sapped]"), 0)
+    g.r(f"tp {spy} 0.5 {Y} 4.5 180 0")
+    g.r(f"scoreboard players set {spy} tf2.is_invisible 1")
+    sap(spy)
+    check("can't sap while cloaked", g.count("@e[tag=tf2.sentry,tag=tf2.sapped]"), 0)
+    g.r(f"scoreboard players set {spy} tf2.is_invisible 0")
+    sap(spy)
+    check("sapper attaches to the enemy sentry", g.count("@e[tag=tf2.sentry,tag=tf2.sapped]"), 1)
+    check("sapper has 100 hp", g.score(sentry, "tf2.building.sapper_hp"), 100)
+    check("sapper belongs to the Spy", g.score(sentry, "tf2.building.sapper_owner"), 9031)
+
+    g.ticks(20)
+    check("drains 25 hp per second", g.score(sentry, "tf2.health"), 125)
+    check("sapped sentry doesn't target the Spy in front of it", g.score(sentry, "tf2.building.target"), None)
+
+    g.r(f"tp {eng} 0.5 {Y} 3.5")
+    g.wrench(eng, sentry)
+    check("wrench hit does 65 to the sapper", g.score(sentry, "tf2.building.sapper_hp"), 35)
+    check("and doesn't repair while sapped", g.score(sentry, "tf2.health") < 150, True)
+    check("and costs no metal", g.score(eng, "tf2.metal"), 70)
+    g.wrench(eng, sentry)
+    check("second hit removes it", g.count("@e[tag=tf2.sentry,tag=tf2.sapped]"), 0)
+    g.r(f"tp {eng} 30 {Y} 30")
+    g.ticks(8)
+    check("still disabled 0.4 s after removal", g.score(sentry, "tf2.building.target"), None)
+    g.ticks(4)
+    check("back online after 0.5 s: targets the Spy", g.score(sentry, "tf2.building.target"), 9031)
+
+    g.r(f"execute as {spy} at @s run tp @s ~ ~ ~ 180 0")
+    sap(spy)
+    g.r(f"scoreboard players set {sentry} tf2.health 5")
+    g.ticks(5)  # one drain lands within 4 ticks; the building notices 0 hp on its next tick
+    check("sapper destroys a building it drains to 0", g.count("@e[type=item_display,tag=tf2.sentry]"), 0)
+
+    print("Sapper: dispensers, construction, teleporter pairs")
+    g.r(f"tp {eng} 0.5 {Y} 0.5 0 0")
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    g.build(eng, 1)
+    disp = "@e[type=item_display,tag=tf2.dispenser,limit=1]"
+    g.ticks(40)
+    progress = g.score(disp, "tf2.building.progress")
+    sap(spy)
+    check("a building under construction can be sapped", g.count("@e[tag=tf2.dispenser,tag=tf2.sapped]"), 1)
+    g.ticks(3)  # short: a 15 hp half-built dispenser dies to the sapper in well under a second
+    check("and stops building while sapped", g.score(disp, "tf2.building.progress"), progress)
+    g.r(f"scoreboard players set {disp} tf2.building.progress 99999")
+    g.r(f"execute as {disp} run function tf2:building/sapper/remove")
+    g.ticks(12)
+    sap(spy)
+    g.r(f"tp {eng} 30 {Y} 30")
+    ally = g.villager("t.ally", 0.5, 3.0, cls=MEDIC, pid=9032, health=20)
+    g.ticks(20)
+    check("sapped dispenser doesn't heal", g.score(ally, "tf2.health"), 20)
+    g.r("kill @e[tag=t.ally]")
+    g.r(f"kill {disp}")
+
+    g.r(f"tp {eng} 0.5 {Y} 0.5 0 0")
+    g.r(f"scoreboard players set {eng} tf2.metal 200")
+    g.build(eng, 2)
+    g.r(f"tp {eng} 8.5 {Y} 0.5 90 0")
+    g.build(eng, 3)
+    g.r("scoreboard players set @e[tag=tf2.teleporter] tf2.building.progress 99999")
+    g.ticks(1)
+    sap(spy)
+    check("sapping the entrance saps the exit too", g.count("@e[tag=tf2.teleporter,tag=tf2.sapped]"), 2)
+    entrance = "@e[type=item_display,tag=tf2.tele_entrance,limit=1]"
+    exit_ = "@e[type=item_display,tag=tf2.tele_exit,limit=1]"
+    g.r(f"tp {eng} 0.5 {Y} 3.5")
+    g.wrench(eng, entrance)
+    check("one wrench hit damages both sappers (entrance)", g.score(entrance, "tf2.building.sapper_hp"), 35)
+    check("one wrench hit damages both sappers (exit)", g.score(exit_, "tf2.building.sapper_hp"), 35)
+    g.wrench(eng, entrance)
+    check("second hit clears both", g.count("@e[tag=tf2.teleporter,tag=tf2.sapped]"), 0)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=25575)
@@ -455,7 +550,7 @@ def main():
     g.r("forceload add -16 -16 16 16")
     g.r("tick freeze")
     try:
-        for test in (test_sentry_construction, test_wrench, test_dispenser, test_destruction, test_integration, test_teleporters):
+        for test in (test_sentry_construction, test_wrench, test_dispenser, test_destruction, test_integration, test_teleporters, test_sapper):
             test(g)
     finally:
         g.reset()

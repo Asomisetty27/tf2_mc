@@ -1,2 +1,3 @@
-function iris:set_coordinates/main
-tag @s add tf2.temp
+function tf2:building/teleporter/tag_match
+execute as @e[tag=tf2.tele_match,tag=!tf2.sapped] at @s run function tf2:building/sapper/attach_one
+tag @e remove tf2.tele_match
